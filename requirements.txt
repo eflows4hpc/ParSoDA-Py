@@ -1,0 +1,4 @@
+emoji==1.7.0
+fastkml==0.12
+geopy==2.2.0
+shapely==1.8.1
