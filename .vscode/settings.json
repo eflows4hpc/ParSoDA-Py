@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "/usr/local/lib/python3.8/dist-packages/pycompss/COMPSs/Bindings/python/3"
+    ]
+}
