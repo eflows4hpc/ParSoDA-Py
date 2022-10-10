@@ -16,9 +16,11 @@ class LocalFilePartition(CrawlerPartition, ABC):
         self.__start = start
         self.__end = end
         self.__parser = parser
+        self.__text_lines = []
+        self.__loaded = False
 
-    def retrieve_data(self) -> List[SocialDataItem]:
-        data: List[SocialDataItem] = []
+    def load_data(self) -> None:
+        data: List[str] = []
         read_bytes = 0
 
         # if we are in the middle of a text line, we skip it
@@ -37,9 +39,16 @@ class LocalFilePartition(CrawlerPartition, ABC):
                 break
             text_line = text_line.strip()
             if text_line != '':
-                item = self.__parser(text_line)
-                data.append(item)
-        return data
+                data.append(text_line)
+        self.__text_lines = data
+        
+        self.__loaded = True
+    
+    def retrieve_data(self) -> List[SocialDataItem]:
+        if not self.__loaded:
+            self.load_data()
+        return [self.__parser(text_line) for text_line in self.__text_lines]
+            
 
 
 class LocalFileCrawler(Crawler, ABC):
@@ -48,21 +57,29 @@ class LocalFileCrawler(Crawler, ABC):
         self.__file_path = file_path
         self.__file_len = os.path.getsize(self.__file_path)
         self.__parser = parser
-        self.__file = open(file_path, "r")
+        self.__file = open(file_path, "r", errors="ignore")
 
     def supports_remote_partitioning(self) -> bool:
         return False
 
-    def get_partitions(self, num_of_partitions) -> List[CrawlerPartition]:
+    def get_partitions(self, num_of_partitions=0, partition_size=1024*1024*1024) -> List[CrawlerPartition]:
         print(f"[ParSoDA.LocalFileCrawler] get_partitions({num_of_partitions})")
+
         partitions: List[CrawlerPartition] = []
-        partition_size = 4*1024*1024*1024 # 4 gigabytes chunk
-        num_partitions = math.ceil(1.0 * self.__file_len / partition_size)
-        #print(f"[LocalFileCrawler:{self.__file_path}] num_partitions={num_partitions}")
-        for i in range(0, num_partitions):
-            #print(f"[LocalFileCrawler:{self.__file_path}] creating partition {i}: {partition_size*i}-{partition_size*(i+1)}")
-            p = LocalFilePartition(self.__file, partition_size*i, partition_size*(i+1), self.__parser)
+
+        if num_of_partitions <= 0:
+            num_of_partitions = math.ceil(1.0 * self.__file_len / partition_size)
+
+        chunk_sizes = [self.__file_len // num_of_partitions]*num_of_partitions
+        reminder = self.__file_len % num_of_partitions
+        for i in range(reminder):
+            chunk_sizes[i] += 1
+
+        start = 0
+        for i in range(0, num_of_partitions):
+            p = LocalFilePartition(self.__file, start, start+chunk_sizes[i], self.__parser)
             partitions.append(p)
+            start += chunk_sizes[i]
         return partitions
 
     def close(self):
@@ -72,4 +89,5 @@ class LocalFileCrawler(Crawler, ABC):
 
     def __del__(self):
         self.close()
+
 

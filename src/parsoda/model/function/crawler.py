@@ -8,6 +8,12 @@ class CrawlerPartition:
     """
     Defines an input data partition
     """
+    
+    @abstractmethod
+    def load_data() -> None:
+        """
+        Load all data of this partition
+        """
 
     @abstractmethod
     def retrieve_data() -> List[SocialDataItem]:
@@ -34,7 +40,7 @@ class Crawler(ABC):
     """
 
     @abstractmethod
-    def get_partitions(self, num_of_partitions) -> List[CrawlerPartition]:
+    def get_partitions(self, num_of_partitions=0, partition_size=1024*1024*1024) -> List[CrawlerPartition]:
         """
         IF the crawler does not support remote partitioning:
             It must return a list composed by one or more CrawlerPartition objects which allow to read all the data

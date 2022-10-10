@@ -23,18 +23,28 @@ class ParsodaPyCompssDriver(ParsodaDriver):
         self.num_partitions = num_partitions
 
     def crawl(self, crawlers: List[Crawler]):
+        def retrieve_partition_data(p: CrawlerPartition) -> List[SocialDataItem]:   # just for type hints
+            return p.retrieve_data()
+        
         for crawler in crawlers:
-            partitions = crawler.get_partitions(self.num_partitions)
+            partitions: List[CrawlerPartition] = crawler.get_partitions(self.num_partitions)
             if not crawler.supports_remote_partitioning():
                 # master-located crawler
                 for p in partitions:
-                    crawler_dds = DDS().load(p.retrieve_data(), num_of_parts=self.num_partitions)
+                    p.load_data()
+                    crawler_dds = (
+                        DDS()
+                        .load([p], num_of_parts=1)
+                        .flat_map(retrieve_partition_data)
+                    )
                     self.dds = self.dds.union(crawler_dds)
             else:
                 # distributed crawler
-                crawler_dds = DDS() \
-                    .load(partitions, num_of_parts=len(partitions)) \
-                    .flat_map(lambda p: p.retrieve_data())  # flat-maps a partition to its data
+                crawler_dds = (
+                    DDS()
+                    .load(partitions, num_of_parts=len(partitions))
+                    .flat_map(retrieve_partition_data)  # flat-maps a partition to its data
+                )
                 self.dds = self.dds.union(crawler_dds)
 
     def filter(self, filter_func):

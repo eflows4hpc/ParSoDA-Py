@@ -2,7 +2,10 @@ import argparse
 import os
 from datetime import datetime
 
-apps_list = ["trajectory_mining_pycompss", "emoji_polarization_pycompss"]
+apps_list = [
+    "trajectory_mining_pycompss", 
+    #"emoji_polarization_pycompss",
+]
 cores_list = [32, 64]
 test_num = 1
 
