@@ -27,7 +27,7 @@ class ParsodaMultiCoreDriver(ParsodaDriver):
         for crawler in crawlers:
             crawler_partitions = crawler.get_partitions(self.__num_partitions)
             for p in crawler_partitions:
-                future = self.__thread_pool.submit(lambda: p.retrieve_data())
+                future = self.__thread_pool.submit(lambda: p.load_data().parse_data())
                 futures.append(future)
 
         for future in futures:

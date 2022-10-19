@@ -31,14 +31,29 @@ if __name__ == '__main__':
     args = parse_command_line()
 
     import pyspark
+    sparkConf = (
+        pyspark.SparkConf()
+        .setMaster(f"local[{args.partitions}]")
+        #.set("dfs.block.size", "128m")
+        .set("spark.hadoop.mapred.max.split.size", "67108864")  # maximum split file size in bytes
+        #.set("spark.hadoop.mapred.max.split.size", "20971520")               # minimum split file size in bytes
+    )
     driver = ParsodaPySparkDriver(pyspark.SparkConf().setMaster(f"local[{args.partitions}]"))
 
     app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions)
 
     app.set_crawlers([
-        LocalFileCrawler('./resources/input/TwitterRome2017_100k.json', TwitterParser()),
-        LocalFileCrawler('./resources/input/flickr100k.json', FlickrParser()),
-        LocalFileCrawler('./resources/input/vinitaly2019.json', Vinitaly2019Parser()),
+        # reads the same dataset more times for reaching a total dimension of data >=10GB
+        LocalFileCrawler('/root/tmpfs/TwitterRome2017_3X.json', TwitterParser()),
+        
+        # LocalFileCrawler('/root/tmpfs/vinitaly2019.json', Vinitaly2019Parser()),
+        # LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
+        # LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
+        # LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
+        
+        # LocalFileCrawler('./resources/input/TwitterRome2017_100k.json', TwitterParser()),
+        # LocalFileCrawler('./resources/input/flickr100k.json', FlickrParser()),
+        # LocalFileCrawler('./resources/input/vinitaly2019.json', Vinitaly2019Parser()),
     ])
     app.set_filters([
         IsInRoI("./resources/input/RomeRoIs.kml")
@@ -46,7 +61,7 @@ if __name__ == '__main__':
     app.set_mapper(FindPoI("./resources/input/RomeRoIs.kml"))
     app.set_secondary_sort_key(lambda x: x[0])
     app.set_reducer(ReduceByTrajectories(3))
-    app.set_analyzer(GapBIDE(0.01, 0, 10))
+    app.set_analyzer(GapBIDE(1, 0, 10))
     app.set_visualizer(
         SortGapBIDE(
             "./resources/output/trajectory_mining.txt", 

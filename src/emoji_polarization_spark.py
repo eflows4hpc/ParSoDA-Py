@@ -38,9 +38,15 @@ if __name__ == '__main__':
     app = SocialDataApp("Emoji Polarization", driver, num_partitions=args.partitions)
 
     app.set_crawlers([
-        LocalFileCrawler('./resources/input/TwitterRome2017_100k.json', TwitterParser()),
-        LocalFileCrawler('./resources/input/flickr100k.json', FlickrParser()),
-        LocalFileCrawler('./resources/input/vinitaly2019.json', Vinitaly2019Parser()),
+        # reads the same dataset more times for reaching a total dimension of data >=10GB
+        LocalFileCrawler('/root/tmpfs/vinitaly2019.json', Vinitaly2019Parser()),
+        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
+        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
+        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
+        
+        # LocalFileCrawler('./resources/input/TwitterRome2017_100k.json', TwitterParser()),
+        # LocalFileCrawler('./resources/input/flickr100k.json', FlickrParser()),
+        # LocalFileCrawler('./resources/input/vinitaly2019.json', Vinitaly2019Parser()),
     ])
     app.set_filters([
         HasEmoji()

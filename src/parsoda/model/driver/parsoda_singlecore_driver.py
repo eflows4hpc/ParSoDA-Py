@@ -12,18 +12,22 @@ class ParsodaSingleCoreDriver(ParsodaDriver):
     def __init__(self):
         self.dataset = None
         self.num_partitions = 0
+        self.chunk_size = 64*1024*1024
 
     def init_environment(self):
         self.dataset = list()
 
     def set_num_partitions(self, num_partitions):
         self.num_partitions = num_partitions
+        
+    def set_chunk_size(self, chunk_size):
+        self.chunk_size = chunk_size
 
     def crawl(self, crawlers: List[Crawler]):
         for crawler in crawlers:
             partitions = crawler.get_partitions(1)
             for p in partitions:
-                for item in p.retrieve_data():
+                for item in p.load_data().parse_data():
                     self.dataset.append(item)
 
     def filter(self, filter_func):

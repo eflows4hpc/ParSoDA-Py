@@ -3,8 +3,11 @@ import shutil
 import os
 from datetime import datetime
 
-apps_list = ["trajectory_mining_spark", "emoji_polarization_spark"]
-cores_list = [32, 64]
+apps_list = [
+    "trajectory_mining_spark", 
+    #"emoji_polarization_spark"
+]
+cores_list = [64]
 test_num = 1
 
 now_time = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")

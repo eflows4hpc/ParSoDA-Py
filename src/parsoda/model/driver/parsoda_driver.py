@@ -21,9 +21,17 @@ class ParsodaDriver(ABC):
         pass
 
     @abstractmethod
-    def set_num_partitions(self, num_partitions) -> None:
+    def set_num_partitions(self, num_partitions: int) -> None:
         """
         Sets the number of data partitions
+        :return: None
+        """
+        pass
+
+    @abstractmethod
+    def set_chunk_size(self, chunk_size: int) -> None:
+        """
+        Sets the size of data partitions in bytes
         :return: None
         """
         pass

@@ -6,7 +6,7 @@ apps_list = [
     "trajectory_mining_pycompss", 
     #"emoji_polarization_pycompss",
 ]
-cores_list = [32, 64]
+cores_list = [64]
 test_num = 1
 
 def parse_commandline():
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     now_time = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
     test_dir = f"./test/parsoda_pycompss/parsoda_pycompss_{now_time}"
     test_results_file = f"{test_dir}/results.csv"
-    test_logs_dir = f"{test_dir}/logs"
+    test_logs_dir = f"{test_dir}"
 
     if not os.path.exists(test_dir):
         os.makedirs(test_dir)
@@ -35,9 +35,6 @@ if __name__ == '__main__':
             )
 
     for app in apps_list:
-        app_logs_dir = f"{test_logs_dir}/{app}"
-        if not os.path.exists(app_logs_dir):
-            os.makedirs(app_logs_dir)
             
         for cores in cores_list:
             num_partitions = 0
@@ -54,13 +51,19 @@ if __name__ == '__main__':
 
             for test_index in range(0, test_num):
                 print(f"Starting app {app} using {cores} cores ({test_index})...")
+            
+                app_logs_dir = f"{test_logs_dir}/{app}/{cores}cores.test{test_index}"
+                if not os.path.exists(app_logs_dir):
+                    os.makedirs(app_logs_dir)
+                    
                 exit_code = os.system(
                     f"runcompss --python_interpreter=python3 "
                     f"--resources=./config/resources.xml "
-                    f"--project=./config/project.xml "
-                    f"--jvm_workers_opts=\"-Xmx4g\" "
-                    f"./src/{app}.py {cores} "
-                    f" > {app_logs_dir}/{cores}cores.test{test_index}.log"
+                    f"--project=./config/project-{cores}cores.xml "
+                    f"--jvm_workers_opts=\"-Xmx20g\" "
+                    #f"--base_log_dir={app_logs_dir} "
+                    f"./src/{app}.py --chunk-size 64"
+                    f" > {app_logs_dir}/{app}.{cores}cores.test{test_index}.log"
                 )
                 
                 if exit_code == 0:

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import abstractmethod, ABC
 from typing import Iterable, List, Optional
 
@@ -10,13 +11,14 @@ class CrawlerPartition:
     """
     
     @abstractmethod
-    def load_data() -> None:
+    def load_data(self) -> CrawlerPartition:
         """
         Load all data of this partition
         """
+        pass
 
     @abstractmethod
-    def retrieve_data() -> List[SocialDataItem]:
+    def parse_data(self) -> List[SocialDataItem]:
         """
         Retrieves all social data items in this partition
 

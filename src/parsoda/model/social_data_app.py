@@ -120,9 +120,10 @@ SORTABLE_KEY = TypeVar('SORTABLE_KEY', bound=SupportsLessThan)  # generic types 
 
 class SocialDataApp(Generic[K, V, R, A]):
 
-    def __init__(self, app_name: str, driver: ParsodaDriver, num_partitions=8):
+    def __init__(self, app_name: str, driver: ParsodaDriver, num_partitions=None, chunk_size=128):
         self.__app_name = app_name
         self.__num_partitions = num_partitions
+        self.__chunk_size = chunk_size
         self.__driver = driver
         
         self.__crawlers: List[Crawler] = []
@@ -133,6 +134,20 @@ class SocialDataApp(Generic[K, V, R, A]):
         self.__analyzer: Optional[Analyzer[K, R, A]] = None
         self.__visualizer: Optional[Visualizer[A]] = None
         self.__report_file: str = "parsoda_report.csv"
+        
+    def set_num_partitions(self, num_partitions: int):
+        """
+        Sets the number of partitions. This is overriden by the chunk size if it is set.
+        """
+        self.__num_partitions = num_partitions
+        return self
+
+    def set_chunk_size(self, chunk_size: int):
+        """
+        Sets the data chunk size in megabytes. This parameter overrides the number of partitions.
+        """
+        self.__chunk_size = chunk_size
+        return self
         
     def set_report_file(self, filename: str):
         self.__report_file = filename
@@ -183,10 +198,6 @@ class SocialDataApp(Generic[K, V, R, A]):
         self.__visualizer = visualizer
         return self
 
-    def set_num_partitions(self, num_partitions):
-        self.__num_partitions = num_partitions
-        return self
-
     def execute(self) -> Dict[str, int]:
         #locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
@@ -212,7 +223,11 @@ class SocialDataApp(Generic[K, V, R, A]):
         print('[ParSoDA] initializing driver...')
         driver.init_environment()
 
-        if self.__num_partitions is not None:
+        if self.__chunk_size is not None and self.__chunk_size > 0:
+            # sets up the data chunk size on the driver
+            driver.set_chunk_size(self.__chunk_size*1024*1024)
+        elif self.__num_partitions is not None and self.__num_partitions > 0:
+            # sets up number of partitions on the driver
             driver.set_num_partitions(self.__num_partitions)
 
         crawling_time: int
@@ -228,6 +243,9 @@ class SocialDataApp(Generic[K, V, R, A]):
         print('[ParSoDA] crawling...')
         driver.crawl(self.__crawlers)
         crawling_time = stopwatch.get_and_reset()
+        
+        print('[ParSoDA] filtering \'None\' values...')
+        driver.filter(lambda item: item is not None)
 
         # item1, item2, item3, item4, ...
 

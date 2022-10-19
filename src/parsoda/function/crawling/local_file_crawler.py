@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from abc import ABC
 import math
 from tracemalloc import start
-from typing import IO, List
+from typing import IO, List, Optional
 import os
 
 from parsoda.model.function.crawler import Crawler, CrawlerPartition, MasterCrawler
@@ -16,10 +18,12 @@ class LocalFilePartition(CrawlerPartition, ABC):
         self.__start = start
         self.__end = end
         self.__parser = parser
-        self.__text_lines = []
+        self.__text_lines: Optional[List[str]] = None
         self.__loaded = False
 
-    def load_data(self) -> None:
+    def load_data(self) -> LocalFilePartition:
+        if self.__loaded:
+            return self
         data: List[str] = []
         read_bytes = 0
 
@@ -34,22 +38,26 @@ class LocalFilePartition(CrawlerPartition, ABC):
         # loop over the interesting file portion
         while self.__start+read_bytes < self.__end:
             text_line: str = self.__file.readline()
-            read_bytes += len(text_line)
-            if text_line == '':
+            text_line_len: int = len(text_line)
+            read_bytes += text_line_len
+            if text_line_len == 0:
                 break
             text_line = text_line.strip()
             if text_line != '':
                 data.append(text_line)
         self.__text_lines = data
-        
         self.__loaded = True
+        
+        self.__file = None
+        
+        # clear the file handle, which is not useful anymore
+        return self
     
-    def retrieve_data(self) -> List[SocialDataItem]:
+    def parse_data(self) -> List[SocialDataItem]:
         if not self.__loaded:
             self.load_data()
         return [self.__parser(text_line) for text_line in self.__text_lines]
             
-
 
 class LocalFileCrawler(Crawler, ABC):
 
@@ -62,18 +70,22 @@ class LocalFileCrawler(Crawler, ABC):
     def supports_remote_partitioning(self) -> bool:
         return False
 
-    def get_partitions(self, num_of_partitions=0, partition_size=1024*1024*1024) -> List[CrawlerPartition]:
-        print(f"[ParSoDA.LocalFileCrawler] get_partitions({num_of_partitions})")
+    def get_partitions(self, num_of_partitions=0, chunk_size=1024*1024*1024) -> List[CrawlerPartition]:
+        print(f"[ParSoDA.LocalFileCrawler.get_partitions] "
+              f"given num_of_partitions={num_of_partitions}; given partition_size={chunk_size/(1024*1024)} MB")
 
         partitions: List[CrawlerPartition] = []
 
-        if num_of_partitions <= 0:
-            num_of_partitions = math.ceil(1.0 * self.__file_len / partition_size)
+        if num_of_partitions is None or num_of_partitions <= 0:
+            num_of_partitions = math.ceil(1.0 * self.__file_len / chunk_size)
 
         chunk_sizes = [self.__file_len // num_of_partitions]*num_of_partitions
         reminder = self.__file_len % num_of_partitions
         for i in range(reminder):
             chunk_sizes[i] += 1
+            
+        print(f"[ParSoDA.LocalFileCrawler.get_partitions] "
+              f"computed num_of_partitions={num_of_partitions}; computed partition size={chunk_sizes[0]/(1024*1024)} MB")
 
         start = 0
         for i in range(0, num_of_partitions):

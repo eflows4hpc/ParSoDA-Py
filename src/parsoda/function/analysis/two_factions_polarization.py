@@ -2,9 +2,9 @@ from parsoda.model import Analyzer
 
 
 class TwoFactionsPolarization(Analyzer):
-
+    
     def analyze(self, data: dict):
-        print(f"[TwoFactionsPolarization] data: {data}")
+        #print(f"[TwoFactionsPolarization] data: {data}")
         print('[TwoFactionsPolarization] data size: ' + str(len(data)))
         result = {}
         positives = 0
