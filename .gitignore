@@ -2,3 +2,4 @@ test/**
 **/__pycache__/
 parsoda_report.csv
 nohup.out
+TRACE*

@@ -3,7 +3,7 @@ from __future__ import annotations
 from abc import ABC
 import math
 from tracemalloc import start
-from typing import IO, List, Optional
+from typing import IO, Any, Callable, List, Optional
 import os
 
 from parsoda.model.function.crawler import Crawler, CrawlerPartition, MasterCrawler
@@ -70,22 +70,30 @@ class LocalFileCrawler(Crawler, ABC):
     def supports_remote_partitioning(self) -> bool:
         return False
 
-    def get_partitions(self, num_of_partitions=0, chunk_size=1024*1024*1024) -> List[CrawlerPartition]:
+    def get_partitions(self, num_of_partitions=0, partition_size=1024*1024*1024) -> List[CrawlerPartition]:
+        print(f"[ParSoDA.LocalFileCrawler.get_partitions] file size={self.__file_len/(1024*1024)} MB")
         print(f"[ParSoDA.LocalFileCrawler.get_partitions] "
-              f"given num_of_partitions={num_of_partitions}; given partition_size={chunk_size/(1024*1024)} MB")
+              f"given number of partitions={num_of_partitions}; given partition size={partition_size/(1024*1024)} MB")
 
         partitions: List[CrawlerPartition] = []
 
         if num_of_partitions is None or num_of_partitions <= 0:
-            num_of_partitions = math.ceil(1.0 * self.__file_len / chunk_size)
-
-        chunk_sizes = [self.__file_len // num_of_partitions]*num_of_partitions
-        reminder = self.__file_len % num_of_partitions
-        for i in range(reminder):
-            chunk_sizes[i] += 1
+            num_of_partitions = self.__file_len // partition_size
+            chunk_sizes = [partition_size]*num_of_partitions
+            reminder = self.__file_len % partition_size
+            if reminder > 0:
+                num_of_partitions += 1
+                chunk_sizes.append(reminder)
+        else:
+            chunk_sizes = [self.__file_len // num_of_partitions]*num_of_partitions
+            reminder = self.__file_len % num_of_partitions
+            for i in range(reminder):
+                chunk_sizes[i] += 1
             
         print(f"[ParSoDA.LocalFileCrawler.get_partitions] "
-              f"computed num_of_partitions={num_of_partitions}; computed partition size={chunk_sizes[0]/(1024*1024)} MB")
+              f"computed number of partitions={num_of_partitions}; computed partition size={chunk_sizes[0]/(1024*1024)} MB")
+        print(f"[ParSoDA.LocalFileCrawler.get_partitions] "
+              f"last partition size={chunk_sizes[-1]/(1024*1024)} MB")
 
         start = 0
         for i in range(0, num_of_partitions):
@@ -101,5 +109,4 @@ class LocalFileCrawler(Crawler, ABC):
 
     def __del__(self):
         self.close()
-
 

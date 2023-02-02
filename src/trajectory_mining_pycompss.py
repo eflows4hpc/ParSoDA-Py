@@ -38,15 +38,10 @@ if __name__ == '__main__':
     app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 
     app.set_crawlers([
-        # reads the same dataset more times for reaching a total dimension of data >=10GB
-        # LocalFileCrawler('/root/tmpfs/TwitterRome2017_3X.json', TwitterParser()),
-        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
-        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
-        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
-        
-        # LocalFileCrawler('./resources/input/TwitterRome2017_100k.json', TwitterParser()),
-        # LocalFileCrawler('./resources/input/flickr100k.json', FlickrParser()),
-        # LocalFileCrawler('./resources/input/vinitaly2019.json', Vinitaly2019Parser()),
+        LocalFileCrawler('/root/dataset/FlickrRome2017.json', FlickrParser())
+        #LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser())
+        #LocalFileCrawler('/root/dataset/TwitterRome2017.json', TwitterParser())
+        #LocalFileCrawler('/root/tmpfs/TwitterRome2017_6X.json', TwitterParser())
     ])
     app.set_filters([
         IsInRoI("./resources/input/RomeRoIs.kml")

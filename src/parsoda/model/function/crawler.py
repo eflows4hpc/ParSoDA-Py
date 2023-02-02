@@ -1,9 +1,9 @@
 from __future__ import annotations
 from abc import abstractmethod, ABC
-from typing import Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional
 
 from parsoda.model.social_data_item import SocialDataItem
-
+    
 
 class CrawlerPartition:
     """

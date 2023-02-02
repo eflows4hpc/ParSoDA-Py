@@ -9,10 +9,10 @@ import time
 
 class ParsodaMultiCoreDriver(ParsodaDriver):
 
-    def __init__(self, parallelism: int = multiprocessing.cpu_count()):
+    def __init__(self, parallelism: int = -1):
         self.__parallelism = parallelism
         self.__dataset: Optional[list] = None
-        self.__num_partitions = parallelism
+        self.__num_partitions = parallelism if parallelism>0 else multiprocessing.cpu_count()
         self.__thread_pool: Optional[ThreadPoolExecutor] = None
 
     def init_environment(self):

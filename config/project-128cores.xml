@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Project>
+
+    <MasterNode>
+        <Processor Name="MainProcessor">
+            <ComputingUnits>32</ComputingUnits>
+            <Architecture>amd64</Architecture>
+            <Speed>2.0</Speed>
+        </Processor>
+        <Memory>
+            <Size>250</Size>
+        </Memory>
+        <Storage>
+            <Size>200.0</Size>
+        </Storage>
+    </MasterNode>
+	
+	<!-- <ComputeNode Name="localhost">
+		<User>root</User>
+        <InstallDir>/usr/local/lib/python3.8/dist-packages/pycompss/COMPSs/</InstallDir>
+        <WorkingDir>/root/COMPSS_tmp/</WorkingDir>
+    </ComputeNode> -->
+	
+	<!-- <ComputeNode Name="10.0.0.12">
+		<User>root</User>
+        <InstallDir>/usr/local/lib/python3.10/dist-packages/pycompss/COMPSs/</InstallDir>
+        <WorkingDir>/root/COMPSS_tmp/</WorkingDir>
+    </ComputeNode> -->
+	
+</Project>

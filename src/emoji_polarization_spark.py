@@ -21,10 +21,14 @@ from parsoda.utils.roi import RoI
 
 def parse_command_line():
     parser = argparse.ArgumentParser(description='Emoji Polarization')
-    parser.add_argument("partitions",
+    parser.add_argument("--partitions", "-p",
                         type=int,
-                        default=8,
+                        default=-1,
                         help="specifies the number of data partitions.")
+    parser.add_argument("--chunk-size", "-c",
+                        type=int,
+                        default=128,
+                        help="specifies the size of data partitions in megabytes.")
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -32,17 +36,15 @@ if __name__ == '__main__':
 
     #driver = ParsodaSingleCoreDriver()
     #driver = ParsodaMultiCoreDriver(4)
-    driver = ParsodaPySparkDriver(SparkConf().setMaster(f"local[{args.partitions}]"))
+    driver = ParsodaPySparkDriver(SparkConf())
     #driver = ParsodaPyCompssDriver()
 
-    app = SocialDataApp("Emoji Polarization", driver, num_partitions=args.partitions)
+    app = SocialDataApp("Emoji Polarization", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 
     app.set_crawlers([
         # reads the same dataset more times for reaching a total dimension of data >=10GB
-        LocalFileCrawler('/root/tmpfs/vinitaly2019.json', Vinitaly2019Parser()),
-        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
-        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
-        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()),
+        LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser()) for i in range(3)
+        #LocalFileCrawler('/root/tmpfs/TwitterRome2017_6X.json', TwitterParser()),
         
         # LocalFileCrawler('./resources/input/TwitterRome2017_100k.json', TwitterParser()),
         # LocalFileCrawler('./resources/input/flickr100k.json', FlickrParser()),

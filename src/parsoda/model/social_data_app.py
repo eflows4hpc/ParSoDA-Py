@@ -11,10 +11,11 @@ from parsoda.utils.stopwatch import StopWatch
 
 class ParsodaReport:
 
-    def __init__(self, app_name, driver, partitions, crawling_time, filter_time, map_time, split_time, reduce_time, analysis_time, visualization_time):
+    def __init__(self, app_name, driver, partitions, chunk_size, crawling_time, filter_time, map_time, split_time, reduce_time, analysis_time, visualization_time):
         self.__app_name = app_name
         self.__driver = driver
         self.__partitions = int(partitions)
+        self.__chunk_size = int(chunk_size)
         self.__crawling_time = crawling_time
         self.__filter_time = filter_time
         self.__map_time = map_time
@@ -35,6 +36,9 @@ class ParsodaReport:
         
     def get_partitions(self):
         return self.__partitions
+    
+    def get_chunk_size(self):
+        return self.__chunk_size
         
     def get_crawling_time(self):
         return self.__crawling_time
@@ -77,6 +81,7 @@ class ParsodaReport:
         "| App name: " + self.__app_name + "\n" + \
         "| ParSoDA Driver: " + type(self.__driver).__name__ + "\n" + \
         "| Data partitions: " + str(self.__partitions) + "\n" + \
+        "| Chunk size: " + str(self.__chunk_size) + "\n" + \
         "|" + "\n" + \
         "| Crawling execution time: " + str(self.__crawling_time) + "\n" + \
         "| Filtering execution time: " + str(self.__filter_time) + "\n" + \
@@ -92,7 +97,9 @@ class ParsodaReport:
     
     def to_csv_line(self, separator: str = ";") -> str:
         return \
+            str(self.__app_name)+separator+\
             str(self.__partitions)+separator+\
+            str(self.__chunk_size)+separator+\
             str(self.__crawling_time)+separator+\
             str(self.__filter_time)+separator+\
             str(self.__map_time)+separator+\
@@ -103,6 +110,22 @@ class ParsodaReport:
             str(self.__filter_to_reduce_time)+separator+\
             str(self.__total_execution_time)+separator+\
             str(self.__total_time)
+    
+    def to_csv_titles(self, separator: str = ";") -> str:
+        return \
+            "App Name"+separator+\
+            "Partitions"+separator+\
+            "Chunk Size"+separator+\
+            "Crawling Time"+separator+\
+            "Filter Time"+separator+\
+            "Map Time"+separator+\
+            "Split Time"+separator+\
+            "Reduce Time"+separator+\
+            "analysis Time"+separator+\
+            "Visualization Time"+separator+\
+            "Filter to Reduce Time"+separator+\
+            "Execution Time"+separator+\
+            "Total Time"
         
 
 class SupportsLessThan(Protocol):
@@ -121,6 +144,13 @@ SORTABLE_KEY = TypeVar('SORTABLE_KEY', bound=SupportsLessThan)  # generic types 
 class SocialDataApp(Generic[K, V, R, A]):
 
     def __init__(self, app_name: str, driver: ParsodaDriver, num_partitions=None, chunk_size=128):
+        """
+        Crerates a new social data app
+        :param app_name: application name
+        :param driver: the driver of the execution environment to use
+        :param num_partitions: the preferrend number of partitions of the input files
+        :param chunk_size: the preferred size of the data chunks read from the input files
+        """
         self.__app_name = app_name
         self.__num_partitions = num_partitions
         self.__chunk_size = chunk_size
@@ -202,17 +232,17 @@ class SocialDataApp(Generic[K, V, R, A]):
         #locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
         if self.__crawlers is None or len(self.__crawlers) == 0:
-            raise Exception("No crawler is given")
+            raise Exception("No crawler is set")
         if self.__filters is None:
             self.__filters: List[Filter] = []
         if self.__mapper is None:
-            raise Exception("No mapper is given")
+            raise Exception("No mapper is set")
         if self.__reducer is None:
-            raise Exception("No reducer is given")
+            raise Exception("No reducer is set")
         if self.__analyzer is None:
-            raise Exception("No analyzer is given")
+            raise Exception("No analyzer is set")
         if self.__visualizer is None:
-            raise Exception("No visualizer is given")
+            raise Exception("No visualizer is set")
 
         # VERY IMPORTANT: de-couples all objects from 'self'
         # Avoids 'self' to be serialized by some execution environment (e.g., PySpark)
@@ -220,15 +250,11 @@ class SocialDataApp(Generic[K, V, R, A]):
         reducer = self.__reducer
         secondary_key = self.__secondary_sort_key_function
 
-        print('[ParSoDA] initializing driver...')
-        driver.init_environment()
 
-        if self.__chunk_size is not None and self.__chunk_size > 0:
-            # sets up the data chunk size on the driver
-            driver.set_chunk_size(self.__chunk_size*1024*1024)
-        elif self.__num_partitions is not None and self.__num_partitions > 0:
-            # sets up number of partitions on the driver
-            driver.set_num_partitions(self.__num_partitions)
+        print('[ParSoDA] initializing driver...')
+        driver.set_chunk_size(self.__chunk_size*1024*1024)
+        driver.set_num_partitions(self.__num_partitions)
+        driver.init_environment()
 
         crawling_time: int
         filter_time: int
@@ -319,6 +345,7 @@ class SocialDataApp(Generic[K, V, R, A]):
             self.__app_name,
             self.__driver,
             self.__num_partitions,
+            self.__chunk_size,
             crawling_time,
             filter_time,
             map_time,
