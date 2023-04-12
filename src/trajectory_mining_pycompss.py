@@ -4,6 +4,7 @@ import argparse
 
 from parsoda import SocialDataApp
 from parsoda.function.analysis.gap_bide_analysis import GapBIDE
+from parsoda.function.crawling.distributed_file_crawler import DistributedFileCrawler
 from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
 from parsoda.function.crawling.parsing.flickr_parser import FlickrParser
 from parsoda.function.crawling.parsing.twitter_parser import TwitterParser
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 
     app.set_crawlers([
-        LocalFileCrawler('/root/dataset/FlickrRome2017.json', FlickrParser())
+        DistributedFileCrawler('resources/input/flickr100k.json', FlickrParser())
         #LocalFileCrawler('/root/tmpfs/TwitterRome2017.json', TwitterParser())
         #LocalFileCrawler('/root/dataset/TwitterRome2017.json', TwitterParser())
         #LocalFileCrawler('/root/tmpfs/TwitterRome2017_6X.json', TwitterParser())

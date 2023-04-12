@@ -3,3 +3,6 @@ test/**
 parsoda_report.csv
 nohup.out
 TRACE*
+resources/input/flickr100k.json
+resources/input/TwitterRome2017_100k.json
+resources/output/*
