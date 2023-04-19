@@ -44,7 +44,7 @@ class ParsodaPyCompssDriver(ParsodaDriver):
                     )
                     self.__dds = self.__dds.union(crawler_dds)
             else:
-                # distributed crawler, we can load each data partition on a remote worker, in order to balance the reading load
+                # distributed crawler, we can load each data partition on a remote worker, in order to balance the reading workload
                 crawler_dds = (
                     DDS()
                     .load(partitions, num_of_parts=len(partitions))

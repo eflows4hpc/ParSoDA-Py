@@ -34,27 +34,24 @@ class ParsodaPySparkDriver(ParsodaDriver):
             partitions: List[CrawlerPartition] = crawler.get_partitions(num_of_partitions=self.__num_partitions, partition_size=self.__chunk_size)
             if not crawler.supports_remote_partitioning():
                 # master-located crawler
-                crawler_rdd = self.__spark_context.emptyRDD()
                 for p in partitions:
-                    p.load_data()
-                    crawler_rdd = (
+                    p.load_data() # load on master, parse on worker
+                    self.__rdd = self.__rdd.union(
                         self.__spark_context
                         .parallelize([p], numSlices=1)
                         .flatMap(lambda p: p.parse_data())
                     )
-                    self.__rdd = self.__rdd.union(crawler_rdd)
             else:
                 # distributed crawler
                 self.__rdd = self.__rdd.union(
                     self.__spark_context
                     .parallelize(partitions, numSlices=len(partitions))
-                    .flatMap(lambda p: p.load_data().parse_data())
+                    .flatMap(lambda p: p.load_data().parse_data()) # load and parse on worker
                 )
-                self.__rdd = self.__rdd.union(crawler_rdd)
                 
         # barrier
-        self.__rdd = self.__rdd.persist(StorageLevel.MEMORY_ONLY)
-        self.__rdd.count()
+        # self.__rdd = self.__rdd.persist(StorageLevel.MEMORY_ONLY)
+        # self.__rdd.count()
     
         
     def filter(self, filter_func):

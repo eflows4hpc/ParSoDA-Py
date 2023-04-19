@@ -74,6 +74,14 @@ class MasterCrawler(Crawler):
 
     def supports_remote_partitioning(self) -> bool:
         return False
+    
+class WorkerCrawler(Crawler):
+    """
+    Defines a crawler that loads SocialDataItem objects directly from the master node
+    """
+
+    def supports_remote_partitioning(self) -> bool:
+        return True
 
 
 class Parser(ABC):
