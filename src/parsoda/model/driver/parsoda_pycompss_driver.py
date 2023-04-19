@@ -51,7 +51,7 @@ class ParsodaPyCompssDriver(ParsodaDriver):
                     .flat_map(lambda p: p.load_data().parse_data())  # flat-maps a partition to its data
                 )
                 self.__dds = self.__dds.union(crawler_dds)
-        compss_barrier()
+        #compss_barrier()
 
     def filter(self, filter_func):
         self.__dds = self.__dds.filter(filter_func)
