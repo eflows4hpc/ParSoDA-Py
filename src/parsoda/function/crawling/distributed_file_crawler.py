@@ -55,6 +55,10 @@ class DistributedFilePartition(CrawlerPartition, ABC):
         if not self.__loaded:
             self.load_data()
         return [self.__parser(text_line) for text_line in self.__text_lines]
+    
+    def __str__(self):
+        return f"DistributedFilePartition[file_path={self.__file_path},start={self.__start},end={self.__end}]"
+        
             
 
 
@@ -66,7 +70,7 @@ class DistributedFileCrawler(Crawler, ABC):
         self.__parser = parser
 
     def supports_remote_partitioning(self) -> bool:
-        return False
+        return True
 
     def get_partitions(self, num_of_partitions=0, partition_size=1024*1024*1024) -> List[CrawlerPartition]:
         print(f"[ParSoDA.DistributedFileCrawler.get_partitions] file size={self.__file_len/(1024*1024)} MB")

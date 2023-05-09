@@ -34,6 +34,7 @@ class ParsodaPySparkDriver(ParsodaDriver):
             partitions: List[CrawlerPartition] = crawler.get_partitions(num_of_partitions=self.__num_partitions, partition_size=self.__chunk_size)
             if not crawler.supports_remote_partitioning():
                 # master-located crawler
+                print("[ParsodaPySparkDriver] reading from local crawler")
                 for p in partitions:
                     p.load_data() # load on master, parse on worker
                     self.__rdd = self.__rdd.union(
@@ -43,6 +44,7 @@ class ParsodaPySparkDriver(ParsodaDriver):
                     )
             else:
                 # distributed crawler
+                print("[ParsodaPySparkDriver] reading from distributed crawler")
                 self.__rdd = self.__rdd.union(
                     self.__spark_context
                     .parallelize(partitions, numSlices=len(partitions))

@@ -7,8 +7,8 @@ apps_list = [
     "trajectory_mining_spark", 
     #"emoji_polarization_spark"
 ]
-cores_list = [256]
-chunk_sizes = [64]
+cores_list = [256, 128, 64, 32, 16, 8, 4, 2]
+chunk_sizes = [64, 128, 256]
 test_num = 1
 
 now_time = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
@@ -56,20 +56,26 @@ if __name__ == '__main__':
                     if not os.path.exists(app_logs_dir):
                         os.makedirs(app_logs_dir)
                  
-                        
                     exit_code = os.system(
-                        f"spark-submit "
-                        f"--driver-memory 100G "
-                        f"--master \"spark://spark:7077\" "
-                        f"--executor-memory {mem}M "
-                        #f"--conf \"spark.memory.fraction=0.7\" "
-                        f"--executor-cores 1 "
-                        f"--conf \"spark.rpc.message.maxSize=1024\" "
-                        f"--num-executors {cores} "
+                        f"/spark/bin/spark-submit "
+                        f"--driver-memory 200G "
+                        f"--master \"spark://spark-master:7077\" "
+                        #f"--executor-memory {mem}M "
+                        #f"--conf \"spark.memory.fraction=0.3\" "
+                        #"--conf \"spark.driver.extraJavaOptions=-Xss512M\" "
+                        #f"--conf \"spark.dynamicAllocation.enabled=true\" " 
+                        #f"--conf \"spark.dynamicAllocation.executorIdleTimeout=120m\" " 
+                        f"--conf \"spark.network.timeout=10000000\" " 
+                        f"--conf \"spark.executor.heartbeatInterval=1000000\" " 
+                        #f"--conf \"spark.rpc.message.maxSize=2047\" "
+                        #f"--conf \"spark.rpc.io.serverThreads=64\" "
+                        f"--conf \"spark.executor.extraJavaOptions=-XX:ThreadStackSize=2048\" "
+                        #f"--executor-cores {cores/nodes}"
+                        #f"--num-executors {cores} "
                         f"--total-executor-cores {cores} "
                         f"--py-files ./parsoda_src.zip "
-                        #f"./src/{app}.py --chunk-size {chunk_size} "
-                        f"./src/{app}.py --partitions {partitions} "
+                        f"./src/{app}.py --chunk-size {chunk_size} "
+                        #f"./src/{app}.py --partitions {partitions} "
                         f"> {app_logs_dir}/{app}.{cores}cores.chunk{chunk_size}.test{test_index}.log"
                     )
 
@@ -113,5 +119,6 @@ if __name__ == '__main__':
 
                         except: 
                             pass
+                        
     # remove sources used for running spark
     os.remove("./parsoda_src.zip")
