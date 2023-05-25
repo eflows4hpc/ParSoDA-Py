@@ -7,6 +7,7 @@ from parsoda.model import ParsodaDriver, Crawler, Filter, Mapper, Reducer
 from concurrent.futures import ThreadPoolExecutor
 import time
 
+# TODO: use python multiprocessing instead of threading
 class ParsodaMultiCoreDriver(ParsodaDriver):
 
     def __init__(self, parallelism: int = -1):

@@ -11,7 +11,7 @@ class SequentialFPGrowth(Analyzer):
         self.association_rules = association_rules
         self.ass_rules_min_confidence = association_rules_min_confidence  # default
 
-    def __call__(self, data):
+    def analyze(self, driver, data):
         """
         l'input è un insieme di traiettorie, l'output è una tupla formata da (l'insieme di itemset con relativo
         supporto e le regole associative ottenute, nel caso il parametro association_rule sia diverso da 'yes'

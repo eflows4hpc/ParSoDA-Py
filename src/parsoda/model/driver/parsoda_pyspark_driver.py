@@ -1,17 +1,15 @@
-import math
-from typing import Iterable, List, TypeVar, Optional
-from pyspark import RDD, SparkContext, SparkConf, BarrierTaskContext, StorageLevel
+from typing import Iterable, List, Optional
+from pyspark import RDD, SparkContext
 from parsoda.model.driver.parsoda_driver import ParsodaDriver
 from parsoda.model.function.crawler import Crawler, CrawlerPartition
 
 class ParsodaPySparkDriver(ParsodaDriver):
 
-    def __init__(self, spark_conf: SparkConf):
+    def __init__(self, spark_context: SparkContext):
         self.__chunk_size = None
         self.__num_partitions: Optional[int] = 64
         self.__rdd: Optional[RDD] = None
-        self.__spark_conf = spark_conf
-        self.__spark_context: Optional[SparkContext] = None
+        self.__spark_context: SparkContext = spark_context
 
     def set_num_partitions(self, num_partitions):
         self.__num_partitions = num_partitions
@@ -20,13 +18,9 @@ class ParsodaPySparkDriver(ParsodaDriver):
         self.__chunk_size = chunk_size
 
     def init_environment(self):
-        # if self.__chunk_size is not None and self.__chunk_size > 0:
-        #     self.__spark_conf.set("spark.hadoop.mapred.max.split.size", f"{self.__chunk_size}")
-        self.__spark_context = SparkContext(conf=self.__spark_conf)
         self.__rdd = self.__spark_context.emptyRDD()
 
     def dispose_environment(self):
-        self.__spark_context = None
         self.__rdd = None
 
     def crawl(self, crawlers: Iterable[Crawler]):
@@ -50,11 +44,6 @@ class ParsodaPySparkDriver(ParsodaDriver):
                     .parallelize(partitions, numSlices=len(partitions))
                     .flatMap(lambda p: p.load_data().parse_data()) # load and parse on worker
                 )
-                
-        # barrier
-        # self.__rdd = self.__rdd.persist(StorageLevel.MEMORY_ONLY)
-        # self.__rdd.count()
-    
         
     def filter(self, filter_func):
         self.__rdd = self.__rdd.filter(filter_func)

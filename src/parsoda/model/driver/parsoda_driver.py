@@ -89,6 +89,8 @@ class ParsodaDriver(ABC):
 
     #TODO: documentation
     def group_by_key(self) -> None:
+        """Assumes that the current dataset is a bulk of key-value pairs and creates a new dataset which groups all the items with the same key. The new dataset will be a bulk of (key)-(list-of-values) pairs.
+        """
         pass
 
     # def combine_by_key(self, mapper: Callable[[Any], Iterable[Any]], combiner: reducer: Callable[[Any, Any], Any]):
@@ -104,7 +106,7 @@ class ParsodaDriver(ABC):
     @abstractmethod
     def dispose_environment(self) -> None:
         """
-        Disposes instantiated resources of the underlying environment, after executing the ParSoDA application
+        Disposes instantiated resources of the underlying environment, after executing the ParSoDA application, in order to reuse this driver as a new fresh driver that should be re-initialized
         :return: None
         """
         pass
