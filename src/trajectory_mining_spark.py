@@ -4,6 +4,7 @@ import argparse
 
 from parsoda import SocialDataApp
 from parsoda.function.analysis.gap_bide_analysis import GapBIDE
+from parsoda.function.crawling.distributed_file_crawler import DistributedFileCrawler
 from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
 from parsoda.function.crawling.parsing.flickr_parser import FlickrParser
 from parsoda.function.crawling.parsing.twitter_parser import TwitterParser
@@ -21,32 +22,32 @@ from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
 
 def parse_command_line():
     parser = argparse.ArgumentParser(description='Trajectory Mining application')
-    parser.add_argument("partitions",
+    parser.add_argument("--partitions", "-p",
                         type=int,
-                        default=8,
+                        default=-1,
                         help="specifies the number of data partitions.")
+    parser.add_argument("--chunk-size", "-c",
+                        type=int,
+                        default=128,
+                        help="specifies the size of data partitions in megabytes.")
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_command_line()
 
     import pyspark
-    driver = ParsodaPySparkDriver(pyspark.SparkConf().setMaster(f"local[{args.partitions}]"))
+    driver = ParsodaPySparkDriver(pyspark.SparkConf())
 
-    app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions)
+    app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 
     app.set_crawlers([
-        LocalFileCrawler('./resources/input/TwitterRome2017_100k.json', TwitterParser()),
-        LocalFileCrawler('./resources/input/flickr100k.json', FlickrParser()),
-        LocalFileCrawler('./resources/input/vinitaly2019.json', Vinitaly2019Parser()),
+        DistributedFileCrawler('/storage/dataset/TwitterRome2017_6X.json', TwitterParser())
     ])
-    app.set_filters([
-        IsInRoI("./resources/input/RomeRoIs.kml")
-    ])
+    app.set_filters([IsInRoI("./resources/input/RomeRoIs.kml")])
     app.set_mapper(FindPoI("./resources/input/RomeRoIs.kml"))
     app.set_secondary_sort_key(lambda x: x[0])
     app.set_reducer(ReduceByTrajectories(3))
-    app.set_analyzer(GapBIDE(0.01, 0, 10))
+    app.set_analyzer(GapBIDE(1, 0, 10))
     app.set_visualizer(
         SortGapBIDE(
             "./resources/output/trajectory_mining.txt", 

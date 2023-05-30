@@ -13,7 +13,7 @@ class GapBIDE(Analyzer[int, Dict[date, RoI], List]):
         self.min_gap = min_gap
         self.max_gap = max_gap
 
-    def analyze(self, data):
+    def analyze(self, driver, data):
         # prepare data
         prepared_data = []
         for a in data:

@@ -7,12 +7,13 @@ from parsoda.model import ParsodaDriver, Crawler, Filter, Mapper, Reducer
 from concurrent.futures import ThreadPoolExecutor
 import time
 
+# TODO: use python multiprocessing instead of threading
 class ParsodaMultiCoreDriver(ParsodaDriver):
 
-    def __init__(self, parallelism: int = multiprocessing.cpu_count()):
+    def __init__(self, parallelism: int = -1):
         self.__parallelism = parallelism
         self.__dataset: Optional[list] = None
-        self.__num_partitions = parallelism
+        self.__num_partitions = parallelism if parallelism>0 else multiprocessing.cpu_count()
         self.__thread_pool: Optional[ThreadPoolExecutor] = None
 
     def init_environment(self):
@@ -27,7 +28,7 @@ class ParsodaMultiCoreDriver(ParsodaDriver):
         for crawler in crawlers:
             crawler_partitions = crawler.get_partitions(self.__num_partitions)
             for p in crawler_partitions:
-                future = self.__thread_pool.submit(lambda: p.retrieve_data())
+                future = self.__thread_pool.submit(lambda: p.load_data().parse_data())
                 futures.append(future)
 
         for future in futures:

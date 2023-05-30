@@ -19,7 +19,7 @@ class ParallelFPGrowth(AbstractAnalysisFunction):
             self.association_rules = options.get_option("association_rules")
             self.ass_rules_min_confidence = float(options.get_option("ass_rules_min_confidence"))
 
-    def run(self, data):
+    def run(self, driver, data):
         prepared_data = prepare_data(data)
         data_frame = pandas.DataFrame({"sequences": prepared_data})
         data_set = DDS().parallelize(data_frame)

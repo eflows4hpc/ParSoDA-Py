@@ -55,7 +55,7 @@ class ItemLocation:
 
 
 class SocialDataItem:
-
+    
     def __init__(self):
         self.id = ''
         self.user_id: str = ''

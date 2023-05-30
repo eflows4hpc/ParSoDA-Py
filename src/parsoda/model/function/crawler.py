@@ -1,16 +1,24 @@
+from __future__ import annotations
 from abc import abstractmethod, ABC
-from typing import Iterable, List, Optional
+from typing import Any, Callable, Iterable, List, Optional
 
 from parsoda.model.social_data_item import SocialDataItem
-
+    
 
 class CrawlerPartition:
     """
     Defines an input data partition
     """
+    
+    @abstractmethod
+    def load_data(self) -> CrawlerPartition:
+        """
+        Load all data of this partition
+        """
+        pass
 
     @abstractmethod
-    def retrieve_data() -> List[SocialDataItem]:
+    def parse_data(self) -> List[SocialDataItem]:
         """
         Retrieves all social data items in this partition
 
@@ -34,7 +42,7 @@ class Crawler(ABC):
     """
 
     @abstractmethod
-    def get_partitions(self, num_of_partitions) -> List[CrawlerPartition]:
+    def get_partitions(self, num_of_partitions=0, partition_size=1024*1024*1024) -> List[CrawlerPartition]:
         """
         IF the crawler does not support remote partitioning:
             It must return a list composed by one or more CrawlerPartition objects which allow to read all the data
@@ -66,6 +74,14 @@ class MasterCrawler(Crawler):
 
     def supports_remote_partitioning(self) -> bool:
         return False
+    
+class WorkerCrawler(Crawler):
+    """
+    Defines a crawler that loads SocialDataItem objects directly from the master node
+    """
+
+    def supports_remote_partitioning(self) -> bool:
+        return True
 
 
 class Parser(ABC):
