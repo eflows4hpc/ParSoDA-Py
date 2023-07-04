@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from typing import Optional, List, Dict
 
 from parsoda.utils.json_serializer import obj_to_json, obj_from_json
@@ -38,6 +39,17 @@ class ItemPostTime:
             self.hour == other.hour and \
             self.minute == other.minute and \
             self.second == other.second
+            
+    def to_json(self) -> str:
+        json_dict = {}
+        json_dict["timestamp"] = self.to_datetime().timestamp()
+        return json.dumps(json_dict)
+    
+    @staticmethod
+    def from_json(json_str: str):
+        timestamp = int(json.loads(json_str)['timestamp'])
+        dt = datetime.fromtimestamp(timestamp)
+        return ItemPostTime(dt)
 
 
 class ItemLocation:
@@ -90,10 +102,36 @@ class SocialDataItem:
         return self.location is not None
 
     def to_json(self) -> str:
-        return obj_to_json(self)
+        json_dict = {}
+        json_dict['id'] = self.id
+        json_dict['user_id'] = self.user_id
+        json_dict['user_name'] = self.user_name
+        json_dict['text'] = self.text
+        json_dict['tags'] = self.tags
+        json_dict['original_format'] = self.original_format
+        json_dict['extras'] = obj_to_json(self.extras)
+        json_dict['date_posted'] = self.date_posted.to_datetime().timestamp() if self.date_posted is not None else "None"
+        json_dict['location'] = (self.location.latitude, self.location.longitude) if self.location is not None else "None"
+        return json.dumps(json_dict)
+        
+        #return obj_to_json(self)
 
-    def from_json(self, json_string: str):
-        self.__dict__ = obj_from_json(json_string).__dict__
+    @staticmethod
+    def from_json(json_string: str):
+        self = SocialDataItem()
+        json_dict = json.loads(json_string)
+        
+        self.id = json_dict['id']
+        self.user_id = json_dict['user_id']
+        self.user_name = json_dict['user_name']
+        self.text = json_dict['text']
+        self.tags = json_dict['tags']
+        self.original_format = json_dict['original_format']
+        self.extras = obj_from_json(json_dict['extras'])
+        self.date_posted = ItemPostTime(datetime.fromtimestamp(json_dict['date_posted'])) if json_dict['date_posted'] != "None" else None
+        self.location = ItemLocation(json_dict['location'][0], json_dict['location'][1]) if json_dict['location'] != "None" else None
+        
+        #self.__dict__ = obj_from_json(json_string).__dict__
         return self
         
     def __key(self):
@@ -131,7 +169,7 @@ class SocialDataItemBuilder:
         :return: a new SocialDataItem
         """
         built = self.item
-        self.item = None
+        self.item = SocialDataItem()
         return built
 
     def set_id(self, id: str):

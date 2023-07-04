@@ -73,9 +73,9 @@ class DistributedFileCrawler(Crawler, ABC):
         return True
 
     def get_partitions(self, num_of_partitions=0, partition_size=1024*1024*1024) -> List[CrawlerPartition]:
-        print(f"[ParSoDA.DistributedFileCrawler.get_partitions] file size={self.__file_len/(1024*1024)} MB")
+        print(f"[ParSoDA.DistributedFileCrawler.get_partitions] file size={self.__file_len/(1024*1024):.2f} MB")
         print(f"[ParSoDA.DistributedFileCrawler.get_partitions] "
-              f"given number of partitions={num_of_partitions}; given partition size={partition_size/(1024*1024)} MB")
+              f"given number of partitions={num_of_partitions}; given partition size={partition_size/(1024*1024):.2f} MB")
 
         partitions: List[CrawlerPartition] = []
 
@@ -93,9 +93,9 @@ class DistributedFileCrawler(Crawler, ABC):
                 chunk_sizes[i] += 1
             
         print(f"[ParSoDA.DistributedFileCrawler.get_partitions] "
-              f"computed number of partitions={num_of_partitions}; computed partition size={chunk_sizes[0]/(1024*1024)} MB")
+              f"computed number of partitions={num_of_partitions}; computed partition size={chunk_sizes[0]/(1024*1024):.2f} MB")
         print(f"[ParSoDA.DistributedFileCrawler.get_partitions] "
-              f"last partition size={chunk_sizes[-1]/(1024*1024)} MB")
+              f"last partition size={chunk_sizes[-1]/(1024*1024):.2f} MB")
 
         start = 0
         for i in range(0, num_of_partitions):

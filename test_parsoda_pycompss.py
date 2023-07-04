@@ -7,10 +7,10 @@ apps_list = [
     "trajectory_mining_pycompss", 
     #"emoji_polarization_pycompss",
 ]
-cores_list = [256,128,64,32,16,8]
+cores_list = [2]
 #dataset_size = 38818;
-chunk_sizes = [170]
-test_num = 3
+chunk_sizes = [128]
+test_num = 1
 
 def parse_commandline():
     parser = argparse.ArgumentParser("ParSoDA-PyCOMPSs test")
@@ -59,19 +59,14 @@ if __name__ == '__main__':
                     app_logs_dir = f"{test_logs_dir}/{app}/{cores}cores.test{test_index}"
                     if not os.path.exists(app_logs_dir):
                         os.makedirs(app_logs_dir)
-                    
-                    jhome = os.environ['JAVA_HOME']
-                    print(f"JAVA_HOME={jhome}")
-                   # current_chunk_size = math.ceil(dataset_size/cores);
+                        
+                        
                     cmd = (
                         f"runcompss --python_interpreter=python3 "
-                        f"--resources=./config/resources-{cores}.xml "
+                        f"--resources=./config/resources.xml "
                         f"--project=./config/project-{cores}cores.xml "
-                        f"--library_path=\"{jhome}\" "
                         f"--jvm_workers_opts=\"-Xmx3900M\" "
-                        #f"--base_log_dir=\"{app_logs_dir}\" "
-                        #f"./src/{app}.py --chunk-size {current_chunk_size} "
-                        f"./src/{app}.py --partitions {cores} "
+                        f"./src/{app}.py --chunk-size {chunk_size} "
                         f" > {app_logs_dir}/{app}.{cores}cores.chunk{chunk_size}.test{test_index}.log"
                     )
                     print(f"command: {cmd}")
@@ -82,20 +77,6 @@ if __name__ == '__main__':
                             with open("parsoda_report.csv", "r") as f:
                                 report_line = f.readline()
                                 fields = report_line.split(";")
-                                
-                                #app_name = fields[0]
-                                # num_partitions_given += int(fields[1])
-                                # chunk_size_given += int(fields[2])
-                                # crawling_time += int(fields[3])
-                                # filter_time += int(fields[4])
-                                # map_time += int(fields[5])
-                                # split_time += int(fields[6])
-                                # reduce_time += int(fields[7])
-                                # analysis_time += int(fields[8])
-                                # visualization_time += int(fields[9])
-                                # filter_to_reduce_time += int(fields[10])
-                                # total_execution_time += int(fields[11])
-                                # total_time += int(fields[12])
 
                                 num_partitions_given = int(fields[1])
                                 chunk_size_given = int(fields[2])

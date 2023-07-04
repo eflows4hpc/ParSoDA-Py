@@ -5,26 +5,29 @@ from shapely.geometry import Point
 
 class RoI:
 
-    def __init__(self, shape, name):
+    def __init__(self, shape: geometry.Polygon, name: str):
         self.shape = shape
         self.name = name
+        
+    def get_center(self) -> geometry.Point:
+        return self.shape.centroid
 
-    def set_shape(self, polygon):
+    def set_shape(self, polygon) -> None:
         self.shape = polygon
 
-    def set_name(self, name):
+    def set_name(self, name) -> None:
         self.name = name
 
-    def get_shape(self):
+    def get_shape(self) -> geometry.Polygon:
         return self.shape
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.name
 
-    def is_in_RoI(self, point):
+    def is_in_RoI(self, point: geometry.Point) -> bool:
         return self.shape.contains(point)
 
-    def get_area_squared_km(self):
+    def get_area_squared_km(self)->float:
         return self.shape.area
 
     def __str__(self):

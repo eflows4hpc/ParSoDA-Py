@@ -35,7 +35,8 @@ def obj_from_json(json_str: str):
         if '__json_object_type_name__' in json_dict:
             obj_class_name = json_dict['__json_object_type_name__']
             try:
-                obj_class = getattr(sys.modules[__name__], obj_class_name)
+                #obj_class = getattr(sys.modules[__name__], obj_class_name)
+                obj_class = globals()[obj_class_name]
                 obj = obj_class()
                 del json_repr['__json_object_type_name__']
             except AttributeError:

@@ -7,6 +7,7 @@ from parsoda.function.analysis.gap_bide_analysis import GapBIDE
 from parsoda.function.crawling.distributed_file_crawler import DistributedFileCrawler
 from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
 from parsoda.function.crawling.parsing.flickr_parser import FlickrParser
+from parsoda.function.crawling.parsing.parsoda_parser import ParsodaParser
 from parsoda.function.crawling.parsing.twitter_parser import TwitterParser
 from parsoda.function.crawling.parsing.vinitaly2019_parser import Vinitaly2019Parser
 from parsoda.function.filtering import IsInPlace, IsInRoI
@@ -39,7 +40,9 @@ if __name__ == '__main__':
     app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 
     app.set_crawlers([
-        DistributedFileCrawler('/storage/dataset/TwitterRome2017_6X.json', TwitterParser())
+        #DistributedFileCrawler('/storage/dataset/TwitterRome2017_6X.json', TwitterParser())
+        #LocalFileCrawler('resources/input/TwitterRome2017_100k.json', TwitterParser())
+        LocalFileCrawler('resources/input/synthetic_10m.json', ParsodaParser())
     ])
     app.set_filters([
         IsInRoI("./resources/input/RomeRoIs.kml")

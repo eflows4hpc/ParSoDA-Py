@@ -75,7 +75,6 @@ if __name__ == '__main__':
                         f"--total-executor-cores {cores} "
                         f"--py-files ./parsoda_src.zip "
                         f"./src/{app}.py --chunk-size {chunk_size} "
-                        #f"./src/{app}.py --partitions {partitions} "
                         f"> {app_logs_dir}/{app}.{cores}cores.chunk{chunk_size}.test{test_index}.log"
                     )
 

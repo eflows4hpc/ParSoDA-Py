@@ -6,7 +6,7 @@ from parsoda.model import Mapper
 from parsoda.utils.emoji_utils import get_emojis, load_emojis
 
 
-class ClassifyByGeocell(Mapper[tuple[float, float], SocialDataItem]):
+class ClassifyByGeocell(Mapper[Tuple[float, float], SocialDataItem]):
     """
     item -> ((lat,lon), item)
     """
