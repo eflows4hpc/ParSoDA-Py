@@ -1,1 +1,1 @@
-PYTHONPATH=src python3 src/parsoda/utils/dataset_generator.py 40g resources/input/RomeRoIs.kml /storage/dataset/synthetic_40g.json
+PYTHONPATH=src python3 src/parsoda/utils/dataset_generator.py 10m resources/input/RomeRoIs.kml resources/input/synthetic_40m.json

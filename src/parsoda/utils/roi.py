@@ -63,7 +63,7 @@ def load_RoIs(file_path):
 
     for x in placemarks:
         point_list = []
-        for a, b in zip(x.geometry.exterior.coords.xy[1], x.geometry.exterior.coords.xy[0]):
+        for a, b in zip(x.geometry.exterior.coords[1], x.geometry.exterior.coords[0]):
             point_list.append(Point(a, b))
         poly = geometry.Polygon([[p.x, p.y] for p in point_list])
         rois.append(RoI(poly, x.name))

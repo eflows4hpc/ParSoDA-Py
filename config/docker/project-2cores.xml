@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Project>
+
+    <MasterNode/>
+	
+	<ComputeNode Name="worker">
+		<User>root</User>
+        <InstallDir>/usr/local/lib/python3.8/dist-packages/pycompss/COMPSs</InstallDir>
+        <WorkingDir>/root/COMPSS_tmp/COMPSsWorker/</WorkingDir>
+        <LimitOfTasks>2</LimitOfTasks>
+    </ComputeNode>
+	
+</Project>

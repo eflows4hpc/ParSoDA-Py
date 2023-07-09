@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ResourcesList>
+
+    <!-- All cluster workers are represented by a single worker that aggregates all the computing units of the cluster. Docker will do the load balancing -->
+    <ComputeNode Name="worker">
+        <Processor Name="MainProcessor">
+            <ComputingUnits>1024</ComputingUnits>
+        </Processor>
+        <Adaptors>
+            <Adaptor Name="es.bsc.compss.nio.master.NIOAdaptor">
+                <SubmissionSystem>
+                    <Interactive/>
+                </SubmissionSystem>
+                <Ports>
+                    <MinPort>43001</MinPort>
+                    <MaxPort>44000</MaxPort>
+                </Ports>
+            </Adaptor>
+            <Adaptor Name="es.bsc.compss.gat.master.GATAdaptor">
+                <SubmissionSystem>
+                    <Batch>
+                        <Queue>sequential</Queue>
+                    </Batch>
+                    <Interactive/>
+                </SubmissionSystem>
+                <BrokerAdaptor>sshtrilead</BrokerAdaptor>
+            </Adaptor>
+        </Adaptors>
+    </ComputeNode>
+	
+</ResourcesList>
