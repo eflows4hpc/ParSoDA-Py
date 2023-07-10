@@ -1,7 +1,4 @@
 test/**
-<<<<<<< HEAD
-**/__pycache__/
-=======
 **/__pycache__/
 parsoda_report.csv
 nohup.out
@@ -9,4 +6,5 @@ TRACE*
 resources/input/flickr100k.json
 resources/input/TwitterRome2017_100k.json
 resources/output/*
->>>>>>> optimized_crawling
+.COMPSs
+.COMPSs_tmp

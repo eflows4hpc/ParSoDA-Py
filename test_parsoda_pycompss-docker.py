@@ -7,7 +7,7 @@ apps_list = [
     "trajectory_mining_pycompss", 
     #"emoji_polarization_pycompss",
 ]
-cores_list = [2]
+cores_list = [8]
 #dataset_size = 38818;
 chunk_sizes = [128]
 test_num = 1
@@ -59,7 +59,6 @@ if __name__ == '__main__':
                     app_logs_dir = f"{test_logs_dir}/{app}/{cores}cores.test{test_index}"
                     if not os.path.exists(app_logs_dir):
                         os.makedirs(app_logs_dir)
-                        
                         
                     cmd = (
                         f"runcompss --python_interpreter=python3 "

@@ -15,25 +15,20 @@ def random_string(length: int):
 def random_text():
     return random_string(30)
 
-def random_users(length: int):
-    users = set()
-    while len(users) < length:
-        users.add(random_string(8))
-    return list(users)
-
 def random_tags(length: int):
+    num_chars = len(str(length))
     tags = set()
     while len(tags) < length:
-        tags.add(random_string(5))
+        tags.add(random_string(num_chars))
     return list(tags)
 
 def estimated_item_size(rois):
-    item = random_item(0, random_users(1), random_tags(3), rois)
+    item = random_item(0, 100, random_tags(1000), rois)
     return len(item.to_json())
         
 
-def random_item(id, users: List[str], tags: List[str], rois: List[RoI], builder = SocialDataItemBuilder()):
-    user_id = random.randrange(0, len(users))
+def random_item(id, users: int, tags: List[str], rois: List[RoI], builder = SocialDataItemBuilder()):
+    user_id = random.randrange(0, users)
     tag1 = tags[random.randrange(0, len(tags))]
     tag2 = tags[random.randrange(0, len(tags))]
     tag3 = tags[random.randrange(0, len(tags))]
@@ -44,7 +39,7 @@ def random_item(id, users: List[str], tags: List[str], rois: List[RoI], builder 
         .set_original_format('parsoda-item') \
         .set_id(id) \
         .set_user_id(user_id) \
-        .set_user_name(users[user_id]) \
+        .set_user_name(f"{user_id:010}") \
         .set_date_posted(datetime.fromtimestamp(random.randrange(1499097285,1688399653))) \
         .set_text(random_string(30)) \
         .set_tags([tag1, tag2, tag3]) \
@@ -69,7 +64,7 @@ def generate_dataset(dimension: str, roi_file_path: Path, output_path: Path)->No
     estimated_row_size = estimated_item_size(rois)+1
     estimated_num_items = int(dimension_bytes/estimated_row_size)
     
-    users: List[str] = random_users(int(estimated_num_items*0.5))
+    users: int = int(estimated_num_items*0.5)
     tags: List[str] = random_tags(1000)
     
     builder = SocialDataItemBuilder()
