@@ -8,3 +8,5 @@ resources/input/TwitterRome2017_100k.json
 resources/output/*
 .COMPSs
 .COMPSs_tmp
+build
+ParSoDA.egg-info

@@ -66,7 +66,7 @@ if __name__ == '__main__':
                         f"--resources=./config/resources.xml "
                         f"--project=./config/project-{cores}cores.xml "
                         f"--jvm_workers_opts=\"-Xmx3900M\" "
-                        f"./src/{app}.py --chunk-size {chunk_size} "
+                        f"parsoda/apps/{app}.py --chunk-size {chunk_size} "
                         f" > {app_logs_dir}/{app}.{cores}cores.chunk{chunk_size}.test{test_index}.log"
                     )
                     print(f"command: {cmd}")

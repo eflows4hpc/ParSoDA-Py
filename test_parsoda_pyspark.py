@@ -28,7 +28,7 @@ if __name__ == '__main__':
             )
             
     # create archive for making sources available to spark
-    shutil.make_archive("./parsoda_src", 'zip', "./src")
+    shutil.make_archive("parsoda_src", 'zip', "parsoda")
 
     for app in apps_list:
         for chunk_size in chunk_sizes:            
@@ -74,7 +74,7 @@ if __name__ == '__main__':
                         #f"--num-executors {cores} "
                         f"--total-executor-cores {cores} "
                         f"--py-files ./parsoda_src.zip "
-                        f"./src/{app}.py --chunk-size {chunk_size} "
+                        f"parsoda/apps/{app}.py --chunk-size {chunk_size} "
                         f"> {app_logs_dir}/{app}.{cores}cores.chunk{chunk_size}.test{test_index}.log"
                     )
 
