@@ -12,7 +12,7 @@ chunk_sizes = [64, 128, 256]
 test_num = 1
 
 now_time = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
-test_dir = f"./test/parsoda_pyspark/parsoda_pyspark_{now_time}"
+test_dir = f"./test_out/parsoda_pyspark/parsoda_pyspark_{now_time}"
 test_results_file = f"{test_dir}/results.csv"
 test_logs_dir = f"{test_dir}/logs"
 

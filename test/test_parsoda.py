@@ -22,7 +22,7 @@ def parse_commandline():
 if __name__ == '__main__':
 
     now_time = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
-    test_dir = f"./test/parsoda_pycompss/parsoda_pycompss_{now_time}"
+    test_dir = f"./test_out/parsoda_pycompss/parsoda_pycompss_{now_time}"
     test_results_file = f"{test_dir}/results.csv"
     test_logs_dir = f"{test_dir}"
 

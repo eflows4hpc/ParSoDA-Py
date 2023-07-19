@@ -1,4 +1,4 @@
-test/**
+test_out/**
 **/__pycache__/
 parsoda_report.csv
 nohup.out

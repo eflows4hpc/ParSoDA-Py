@@ -1,6 +1,6 @@
 # ParSoDA-Python
 This project is a porting of the ParSoDA java library to the python environment. 
-ParSoDA has been extended to support multiple execution runtimes. Specifically, according to the bridge design pattern, we defined the ParsodaDriver interface (i.e., the implementor of the bridge pattern) that allows a developer to implement adapters for different execution systems. A valid instance of ParsodaDriver must invoke some function that exploits some parallel pattern, such as Map, Filter, ReduceByKey and SortByKey. The SocialDataApp class is the abstraction of the bridge pattern and is designed to use these parallel patterns efficiently for running ParSoDA applications. It is worth noting that the execution flow of an application remains unchanged even by changing the execution runtime, which makes the porting of a ParSoDA application to new execution runtimes.
+ParSoDA has been extended to support multiple execution runtimes. Specifically, according to the bridge design pattern, we defined the ParsodaDriver interface (i.e., the implementor of the bridge pattern) that allows a developer to implement adapters for different execution systems. A valid instance of ParsodaDriver must invoke some function that exploits some parallel pattern, such as Map, Filter, ReduceByKey and SortByKey. The SocialDataApp class is the abstraction of the bridge pattern and is designed to use these parallel patterns efficiently for running ParSoDA applications. It is worth noting that the execution flow of an application remains unchanged even by changing the execution runtime, which allows to run ParSoDA applications on different execution runtimes without modifying their code at all.
 
 # Dependencies
 The ParSoDA library strictly requires Python 3.8 or above.
@@ -11,17 +11,26 @@ At least one of the following libraries is required in order to execute ParSoDA 
 
 For executing ParSoDA sample applications, i.e. Trajectory Mining and Emoji Polarization, included in this repository, the following Python libraries are required::
 
-    emoji==1.7.0
-    fastkml==0.12
-    geopy==2.2.0
-    shapely==1.8.1
+    emoji>=1.7.0,<2
+    fastkml>=0.12,<1
+    geopy>=2.2.0,<3
+    shapely>=2.0.1,<3
  
 The ParSoDA package contains a file “requirements.txt” which can be used with pip to install the application requirements, executing the following command in the root directory of ParSoDA::
 
     python3 -m pip install -r requirements.txt 
 
+# Installing ParSoDA through pip
+ParSoDA can be installed by pip through the setup.py script. You just need to change current directory to the root of this repository
+
+    cd <ParSoDA repo root directory>
+
+and run
+
+    pip3 install .
+
 # ParSoDA on top of PyCOMPSs
-For using the ParSoDA library on top of PyCOMPSs, it is required to import and instantiate the ParsodaPyCompssDriver class, as in the following Trajectory Mining example::
+For using the ParSoDA library on top of PyCOMPSs, it is required to import and instantiate the ParsodaPyCompssDriver class, as in the following Trajectory Mining example:
 
     driver = ParsodaPyCompssDriver()
     
