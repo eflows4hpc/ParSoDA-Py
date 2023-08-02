@@ -15,6 +15,7 @@ from parsoda.function.filtering import IsInPlace, IsInRoI
 from parsoda.function.mapping.find_poi import FindPoI
 from parsoda.function.reduction.reduce_by_trajectories import ReduceByTrajectories
 from parsoda.function.visualization.sort_gap_bide import SortGapBIDE
+from parsoda.model.driver.parsoda_pycompss_task_driver import ParsodaPyCompssTaskDriver
 from parsoda.utils.roi import RoI
 
 from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
@@ -35,7 +36,7 @@ def parse_command_line():
 if __name__ == '__main__':
     args = parse_command_line()
 
-    driver = ParsodaPyCompssDriver()
+    driver = ParsodaPyCompssTaskDriver()
     
     app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 

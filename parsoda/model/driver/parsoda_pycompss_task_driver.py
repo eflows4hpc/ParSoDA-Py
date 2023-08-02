@@ -1,6 +1,7 @@
 import math
 import os
 from collections import Callable
+import queue
 from typing import List, TypeVar, Optional
 from parsoda.model.function.crawler import CrawlerPartition
 
@@ -13,11 +14,49 @@ from parsoda.model import ParsodaDriver, Crawler, Filter, Mapper, Reducer
 
 
 class ParsodaPyCompssTaskDriver(ParsodaDriver):
+    """Parsoda driver for PyCOMPSs, based on PyCOMPSs task constructs. 
+    
+    This driver could be more efficient, depending on the installed version of PyCOMPSs, than its counterpart, the ParsodaPyCompssDriver, which is instead based on DDS.
+    """
 
     def __init__(self):
         self.__chunk_size = None
         self.__num_partitions: Optional[int] = 8
         self.__partitions: Optional[List] = None
+        
+    def __map_partitions(self, partition_mapper):
+        @task(returns=list)
+        def _task_map(partition: list)->list:
+            result = partition_mapper(partition)
+        for i in range(len(self.__partitions)):
+            self.__partitions[i] = _task_map(self.__partitions[i])
+    
+    def __distribute(self):
+        if len(self.__partitions) < self.__num_partitions:
+            merged = self.__collect()
+            
+            new_partitions = []
+            n = len(merged)
+            k = len(self.__num_partitions)
+            p_sizes = [n // k]*k
+            reminder = n % k
+            for i in range(reminder):
+                p_sizes[i] += 1
+            
+            cursor = 0
+            for p_size in p_sizes:
+                end = cursor+p_size
+                new_partitions.append(merged[cursor:end])
+                cursor=end
+            
+            self.__partitions = new_partitions
+            
+    def __collect(self)->list:
+        compss_barrier()
+        merged = []
+        for p in self.__partitions:
+            merged.extend(p)
+        return merged
         
     def set_chunk_size(self, chunk_size: int):
         self.__chunk_size = chunk_size
@@ -55,13 +94,6 @@ class ParsodaPyCompssTaskDriver(ParsodaDriver):
                     p_data = _task_load_and_parse(p)
                     self.__partitions.append(p_data)
         #compss_barrier()
-        
-    def __map_partitions(self, partition_mapper, partitions):
-        @task(returns=list)
-        def _task_map(partition: list)->list:
-            result = partition_mapper(partition)
-        for i in range(len(self.__partitions)):
-            partitions[i] = _task_map(partitions[i])
 
     def filter(self, filter_func):
         def mapper_filter(partition: list)->list:
@@ -81,13 +113,43 @@ class ParsodaPyCompssTaskDriver(ParsodaDriver):
             return result
         self.__map_partitions(mapper_flatmap)
 
-    #TODO
-
-    # def sort_by_key(self) -> None:
-    #     pass
-
     def group_by_key(self) -> None:
-        self.__dds = self.__dds.group_by_key()
+        
+        @task(returns=dict)
+        def __group_merge(part1: list, part2: list)->list:
+            result = []
+            for kv_pair in part1:
+                k = kv_pair[0]
+                v = kv_pair[1]
+                if k in result:
+                    result[k].append(v)
+                else:
+                    result[k] = [v]
+            for kv_pair in part2:
+                k = kv_pair[0]
+                v = kv_pair[1]
+                if k in result:
+                    result[k].append(v)
+                else:
+                    result[k] = [v]
+            return result
+                    
+        q = queue.Queue()
+        for p in self.__partitions:
+            q.put(p)
+                    
+        while q.qsize() > 1:
+            p1 = q.get()
+            p2 = q.get()
+            merged = __group_merge(p1, p2)
+            q.put(merged)
+            
+        self.__partitions = [q.get()]
+        
+        self.__distribute()
+        
+        
 
     def get_result(self):
-        return self.__dds.collect(keep_partitions=False, future_objects=False)
+        data = self.__collect()
+        return data

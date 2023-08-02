@@ -4,7 +4,7 @@ import math
 from datetime import datetime
 
 apps_list = [
-    "trajectory_mining_pycompss", 
+    "trajectory_mining_pycompss_task", 
     #"emoji_polarization_pycompss",
 ]
 cores_list = [8]

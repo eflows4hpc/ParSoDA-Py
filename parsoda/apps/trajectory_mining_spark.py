@@ -36,7 +36,7 @@ if __name__ == '__main__':
     args = parse_command_line()
 
     import pyspark
-    driver = ParsodaPySparkDriver(pyspark.SparkConf())
+    driver = ParsodaPySparkDriver(pyspark.SparkContext(conf=pyspark.SparkConf()))
 
     app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 

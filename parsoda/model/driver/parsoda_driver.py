@@ -79,22 +79,11 @@ class ParsodaDriver(ABC):
         """
         self.flatmap(lambda item: [mapper(item)])
 
-    @abstractmethod
-    def sort_by_key(self) -> None:
-        """
-        Sorts by key all the items of the current dataset as key-value pairs, represented as tuples of two elements each.
-        :return: None
-        """
-        pass
-
     #TODO: documentation
     def group_by_key(self) -> None:
         """Assumes that the current dataset is a bulk of key-value pairs and creates a new dataset which groups all the items with the same key. The new dataset will be a bulk of (key)-(list-of-values) pairs.
         """
         pass
-
-    # def combine_by_key(self, mapper: Callable[[Any], Iterable[Any]], combiner: reducer: Callable[[Any, Any], Any]):
-    #   pass
 
     def get_result(self) -> Any:
         """

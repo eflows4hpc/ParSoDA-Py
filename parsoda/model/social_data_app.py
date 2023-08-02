@@ -145,7 +145,7 @@ class SocialDataApp(Generic[K, V, R, A]):
 
     def __init__(self, app_name: str, driver: ParsodaDriver, num_partitions=None, chunk_size=128):
         """
-        Crerates a new social data app
+        Creates a new social data app
         :param app_name: application (or sub-application) name
         :param driver: the driver of the execution environment to use
         :param num_partitions: the preferrend number of partitions of the input files

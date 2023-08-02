@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     #driver = ParsodaSingleCoreDriver()
     #driver = ParsodaMultiCoreDriver(4)
-    driver = ParsodaPySparkDriver(SparkConf())
+    driver = ParsodaPySparkDriver(SparkContext(conf=SparkConf()))
     #driver = ParsodaPyCompssDriver()
 
     app = SocialDataApp("Emoji Polarization", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
