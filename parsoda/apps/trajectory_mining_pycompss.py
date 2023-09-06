@@ -41,8 +41,8 @@ if __name__ == '__main__':
 
     app.set_crawlers([
         #DistributedFileCrawler('/storage/dataset/TwitterRome2017_6X.json', TwitterParser())
-        LocalFileCrawler('resources/input/TwitterRome2017_100k.json', TwitterParser())
-        #LocalFileCrawler('resources/input/synthetic_40m.json', ParsodaParser())
+        #LocalFileCrawler('resources/input/TwitterRome2017_100k.json', TwitterParser())
+        LocalFileCrawler('resources/input/synthetic_40m.json', ParsodaParser())
     ])
     app.set_filters([
         IsInRoI("./resources/input/RomeRoIs.kml")

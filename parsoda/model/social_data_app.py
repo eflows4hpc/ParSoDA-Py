@@ -251,7 +251,7 @@ class SocialDataApp(Generic[K, V, R, A]):
         secondary_key = self.__secondary_sort_key_function
 
 
-        print(f"[ParSoDA/{self.__app_name}] initializing driver...")
+        print(f"[ParSoDA/{self.__app_name}] initializing driver: {type(self.__driver).__name__}")
         driver.set_chunk_size(self.__chunk_size*1024*1024)
         driver.set_num_partitions(self.__num_partitions)
         driver.init_environment()
