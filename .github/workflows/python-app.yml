@@ -14,8 +14,7 @@ permissions:
 
 jobs:
   build:
-
-    #runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     container:
       image: compss/compss:latest
     steps:
