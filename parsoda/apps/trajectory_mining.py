@@ -1,23 +1,13 @@
-from datetime import date
-import os
-import sys
-import argparse
-from typing import List, Tuple
+from typing import List
 
 from parsoda import SocialDataApp
 from parsoda.function.analysis.gap_bide_analysis import GapBIDE
-from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
-from parsoda.function.crawling.parsing.flickr_parser import FlickrParser
-from parsoda.function.crawling.parsing.twitter_parser import TwitterParser
-from parsoda.function.crawling.parsing.vinitaly2019_parser import Vinitaly2019Parser
-from parsoda.function.filtering import IsInPlace, IsInRoI
+from parsoda.function.filtering import IsInRoI
 
 from parsoda.function.mapping.find_poi import FindPoI
 from parsoda.function.reduction.reduce_by_trajectories import ReduceByTrajectories
 from parsoda.function.visualization.sort_gap_bide import SortGapBIDE
 from parsoda.model.driver.parsoda_driver import ParsodaDriver
-from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
-from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
 from parsoda.model.function.crawler import Crawler
 
 
