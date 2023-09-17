@@ -61,6 +61,9 @@ jobs:
         
     #     # installs the latest version of PyCOMPSs
     #     python3 -m pip install pycompss -v
+    - name: Install PyCOMPSs
+      run: |
+        python3 -m pip install pycompss -v
     - name: Install PySpark
       run: |
         python3 -m pip install pyspark
