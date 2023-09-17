@@ -11,7 +11,21 @@ from parsoda.utils.stopwatch import StopWatch
 
 class ParsodaReport:
 
-    def __init__(self, app_name, driver, partitions, chunk_size, crawling_time, filter_time, map_time, split_time, reduce_time, analysis_time, visualization_time):
+    def __init__(
+        self, 
+        app_name, 
+        driver, 
+        partitions, 
+        chunk_size, 
+        crawling_time, 
+        filter_time, 
+        map_time, 
+        split_time, 
+        reduce_time, 
+        analysis_time, 
+        visualization_time,
+        reduce_result_length
+    ):
         self.__app_name = app_name
         self.__driver = driver
         self.__partitions = int(partitions)
@@ -27,6 +41,8 @@ class ParsodaReport:
         self.__filter_to_reduce_time = filter_time + map_time + split_time + reduce_time
         self.__total_execution_time = self.__filter_to_reduce_time + analysis_time + visualization_time
         self.__total_time = crawling_time + self.__total_execution_time
+        
+        self.__reduce_result_length = reduce_result_length
                      
     def get_app_name(self):
         return self.__app_name
@@ -69,6 +85,9 @@ class ParsodaReport:
         
     def get_total_time(self):
         return self.__total_time
+        
+    def get_reduce_result_length(self):
+        return self.__reduce_result_length
 
     def __repr__(self):
         return str(self)
@@ -93,7 +112,9 @@ class ParsodaReport:
         "|" + "\n" + \
         "| Total Filter-To-Reduce time: " + str(self.__filter_to_reduce_time) + "\n" + \
         "| Total execution time: " + str(self.__total_execution_time) + "\n" + \
-        "| Total time: " + str(self.__total_time) + "\n"
+        "| Total time: " + str(self.__total_time) + "\n" \
+        "|" + "\n" + \
+        "| Reduce result length: " + str(self.__reduce_result_length) + "\n"
     
     def to_csv_line(self, separator: str = ";") -> str:
         return \
@@ -109,7 +130,8 @@ class ParsodaReport:
             str(self.__visualization_time)+separator+\
             str(self.__filter_to_reduce_time)+separator+\
             str(self.__total_execution_time)+separator+\
-            str(self.__total_time)
+            str(self.__total_time)+separator+\
+            str(self.__reduce_result_length)
     
     def to_csv_titles(self, separator: str = ";") -> str:
         return \
@@ -125,7 +147,8 @@ class ParsodaReport:
             "Visualization Time"+separator+\
             "Filter to Reduce Time"+separator+\
             "Execution Time"+separator+\
-            "Total Time"
+            "Total Time"+separator+\
+            "Reduce Result Length"
         
 
 class SupportsLessThan(Protocol):
@@ -228,7 +251,7 @@ class SocialDataApp(Generic[K, V, R, A]):
         self.__visualizer = visualizer
         return self
 
-    def execute(self) -> Dict[str, int]:
+    def execute(self) -> ParsodaReport:
         #locale.setlocale(locale.LC_ALL, "en_US.utf8")
 
         if self.__crawlers is None or len(self.__crawlers) == 0:
@@ -315,17 +338,18 @@ class SocialDataApp(Generic[K, V, R, A]):
         reduce_time = stopwatch.get_and_reset()
 
         # reduction_result == {k1 -> r1, k3 -> r3, k6 -> r6, ...}
+        
+        reduction_result_length = len(reduction_result)
+        print(f"[ParSoDA/{self.__app_name}] len(reduction_result)={reduction_result_length}")
 
-        print(f"[ParSoDA/{self.__app_name}] len(reduction_result)={len(reduction_result)}")
-
-        reduction_data_len = 0
-        for k, v in reduction_result.items():
-            reduction_data_len += 1
-            if isinstance(v, Iterable):
-                reduction_data_len += len(v)
-            else:
-                reduction_data_len += 1
-        print(f"[ParSoDA/{self.__app_name}] all reduction results (keys and values)={reduction_data_len}")
+        # reduction_data_len = 0
+        # for k, v in reduction_result.items():
+        #     reduction_data_len += 1
+        #     if isinstance(v, Iterable):
+        #         reduction_data_len += len(v)
+        #     else:
+        #         reduction_data_len += 1
+        # print(f"[ParSoDA/{self.__app_name}] all reduction results (keys and values)={reduction_data_len}")
         stopwatch.reset()
 
         print(f"[ParSoDA/{self.__app_name}] disposing driver...")
@@ -352,7 +376,8 @@ class SocialDataApp(Generic[K, V, R, A]):
             split_time,
             reduce_time,
             analysis_time,
-            visualization_time
+            visualization_time,
+            reduce_result_length=reduction_result_length
         )
         print(report)
         

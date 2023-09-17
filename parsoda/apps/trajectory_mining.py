@@ -26,19 +26,14 @@ from parsoda.utils.roi import RoI
 from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
 from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 
-supported_formats = {
-    "twitter": TwitterParser(),
-    "flickr": FlickrParser(),
-    "vinitaly2019": Vinitaly2019Parser(),
-}
 
-def mine_trajectories(
+def build_trajectory_mining(
     driver: ParsodaDriver,
     crawlers: List[Crawler],
     rois_file: str,
     *, 
     num_partitions=-1, 
-    chunk_size=128, 
+    chunk_size=64, 
     min_trajectory_length=3,  
     min_support=1, 
     min_gap=0, 
@@ -63,7 +58,4 @@ def mine_trajectories(
             min_length=visualization_min_length
         )
     )
-
-    app.execute()
-
-    
+    return app
