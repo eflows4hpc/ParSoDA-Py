@@ -4,8 +4,6 @@ import sys
 import argparse
 from typing import List, Tuple
 
-import pyspark
-
 from parsoda import SocialDataApp
 from parsoda.function.analysis.gap_bide_analysis import GapBIDE
 from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
@@ -21,10 +19,6 @@ from parsoda.model.driver.parsoda_driver import ParsodaDriver
 from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
 from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
 from parsoda.model.function.crawler import Crawler
-from parsoda.utils.roi import RoI
-
-from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
-from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 
 
 def build_trajectory_mining(
