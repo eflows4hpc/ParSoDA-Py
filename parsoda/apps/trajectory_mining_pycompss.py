@@ -3,6 +3,7 @@ import sys
 import argparse
 
 from parsoda import SocialDataApp
+from parsoda.apps.trajectory_mining import build_trajectory_mining
 from parsoda.function.analysis.gap_bide_analysis import GapBIDE
 from parsoda.function.crawling.distributed_file_crawler import DistributedFileCrawler
 from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
@@ -30,34 +31,22 @@ def parse_command_line():
                         type=int,
                         default=128,
                         help="specifies the size of data partitions in megabytes.")
+    parser.add_argument(
+        ""
+    )
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_command_line()
-
-    driver = ParsodaPyCompssDriver()
     
-    app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
-
-    app.set_crawlers([
-        #DistributedFileCrawler('/storage/dataset/TwitterRome2017_6X.json', TwitterParser())
-        #LocalFileCrawler('resources/input/TwitterRome2017_100k.json', TwitterParser())
-        LocalFileCrawler('resources/input/synthetic_40m.json', ParsodaParser())
-    ])
-    app.set_filters([
-        IsInRoI("./resources/input/RomeRoIs.kml")
-    ])
-    app.set_mapper(FindPoI("./resources/input/RomeRoIs.kml"))
-    app.set_secondary_sort_key(lambda x: x[0])
-    app.set_reducer(ReduceByTrajectories(3))
-    app.set_analyzer(GapBIDE(1, 0, 10))
-    app.set_visualizer(
-        SortGapBIDE(
-            "./resources/output/trajectory_mining.txt", 
-            'support', 
-            mode='descending', 
-            min_length=3
-        )
+    build_trajectory_mining(
+        driver = ParsodaPyCompssDriver(),
+        crawlers = [
+            #DistributedFileCrawler('/storage/dataset/TwitterRome2017_6X.json', TwitterParser())
+            #LocalFileCrawler('resources/input/TwitterRome2017_100k.json', TwitterParser())
+            LocalFileCrawler('resources/input/synthetic_40m.json', ParsodaParser())
+        ],
+        rois_file="./resources/input/RomeRoIs.kml",
+        num_partitions=args.partitions, 
+        chunk_size=args.chunk_size
     )
-
-    app.execute()
