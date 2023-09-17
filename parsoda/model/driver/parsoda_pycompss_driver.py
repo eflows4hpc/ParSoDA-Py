@@ -1,6 +1,3 @@
-import math
-import os
-from collections import Callable
 from typing import List, TypeVar, Optional
 from parsoda.model.function.crawler import CrawlerPartition
 
