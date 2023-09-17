@@ -61,9 +61,18 @@ jobs:
         
     #     # installs the latest version of PyCOMPSs
     #     python3 -m pip install pycompss -v
-    - name: Install PySpark
-      run: |
-        python3 -m pip install pyspark
+    # - name: Install PySpark
+    #   run: |
+    #     python3 -m pip install pyspark
+    - uses: vemonet/setup-spark@v1
+      with:
+        spark-version: '3.4.1'
+        hadoop-version: '3'
+        scala-version: '2.13'
+        spark-url: 'https://archive.apache.org/dist/spark/spark-3.4.1/spark-3.4.1-bin-hadoop3-scala2.13.tgz'
+        xms: '1024M'
+        xmx: '2048M'
+        log-level: 'debug'
     - name: Test with unittest
       run: |
         python3 -m unittest -v
