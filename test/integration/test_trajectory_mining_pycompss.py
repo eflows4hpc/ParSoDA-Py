@@ -24,6 +24,3 @@ class TestTrajectoryMiningPyCOMPSs(unittest.TestCase):
         
         self.assertEqual(report.get_reduce_result_length(), 1709)
         
-        
-        
-        

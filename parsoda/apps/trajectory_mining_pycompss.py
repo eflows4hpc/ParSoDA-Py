@@ -48,4 +48,4 @@ if __name__ == '__main__':
         rois_file="./resources/input/RomeRoIs.kml",
         num_partitions=args.partitions, 
         chunk_size=args.chunk_size
-    )
+    ).execute()
