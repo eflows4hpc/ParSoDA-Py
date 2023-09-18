@@ -16,7 +16,8 @@ class TestTrajectoryMiningPyCOMPSs(unittest.TestCase):
             crawlers = [
                 LocalFileCrawler('resources/input/test.json', ParsodaParser())
             ],
-            rois_file="./resources/input/RomeRoIs.kml"
+            rois_file="./resources/input/RomeRoIs.kml",
+            visualization_file="test_out/trajectory_mining.txt"
         )
         
         report = app.execute()
