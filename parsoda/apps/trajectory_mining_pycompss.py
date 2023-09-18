@@ -3,7 +3,7 @@ import sys
 import argparse
 
 from parsoda import SocialDataApp
-from parsoda.apps.trajectory_mining import build_trajectory_mining
+from parsoda.apps.trajectory_mining import parsoda_trajectory_mining
 from parsoda.function.analysis.gap_bide_analysis import GapBIDE
 from parsoda.function.crawling.distributed_file_crawler import DistributedFileCrawler
 from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
@@ -18,11 +18,10 @@ from parsoda.function.reduction.reduce_by_trajectories import ReduceByTrajectori
 from parsoda.function.visualization.sort_gap_bide import SortGapBIDE
 from parsoda.utils.roi import RoI
 
-from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
 from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 
 def parse_command_line():
-    parser = argparse.ArgumentParser(description='Trajectory Mining application')
+    parser = argparse.ArgumentParser(description='Trajectory Mining application on top of PyCOMPSs')
     parser.add_argument("--partitions", "-p",
                         type=int,
                         default=-1,
@@ -39,7 +38,7 @@ def parse_command_line():
 if __name__ == '__main__':
     args = parse_command_line()
     
-    build_trajectory_mining(
+    parsoda_trajectory_mining(
         driver = ParsodaPyCompssDriver(),
         crawlers = [
             #DistributedFileCrawler('/storage/dataset/TwitterRome2017_6X.json', TwitterParser())

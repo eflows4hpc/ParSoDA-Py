@@ -11,7 +11,7 @@ from parsoda.model.driver.parsoda_driver import ParsodaDriver
 from parsoda.model.function.crawler import Crawler
 
 
-def build_trajectory_mining(
+def parsoda_trajectory_mining(
     driver: ParsodaDriver,
     crawlers: List[Crawler],
     rois_file: str,
