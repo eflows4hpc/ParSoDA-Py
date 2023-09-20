@@ -21,6 +21,6 @@ jobs:
     - name: Build Docker image
       run: docker build -t local .
     - name: Run unit tests
-      run: docker run -t local -w /parsoda python3 -m unittest -v
+      run: docker run -t local python3 -m unittest -v
     - name: Run build tests
-      run: docker run -t local -w /parsoda python3 -m pip install .
+      run: docker run -t local python3 -m pip install .
