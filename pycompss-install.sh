@@ -30,6 +30,6 @@ python3 -m pip install --upgrade pip setuptools
 python3 -m pip install dill guppy3
 
 # installs the latest version of PyCOMPSs
-python3 -m pip install pycompss -v
+python3 -m pip install pycompss==3.1 -v
 
 
