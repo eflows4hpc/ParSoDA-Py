@@ -9,45 +9,44 @@ import test.runtime as rt
 
 runtimes: List[rt.TestRuntime] = [rt.PyCompssScalabTestRuntime(), rt.PySparkScalabTestRuntime()]
 use_cases = [
-    "trajectory_mining_40m", 
+    #"trajectory_mining_40m", 
     "trajectory_mining_1m", 
     #"emoji_polarization_pycompss",
 ]
-cores_list = [256, 128, 64, 32, 16, 8]
+cores_list = [8]
 chunk_size = 64
 test_num = 1
-
 
 if __name__ == '__main__':
 
     now_time = datetime.now().strftime("%Y.%m.%d_%H.%M.%S")
     test_dir = f"./test_out/performance/{now_time}"
-    test_results_file = f"{test_dir}/results.xlsx"
+    test_results_file = f"{test_dir}/results"
     test_logs_dir = f"{test_dir}"
     apps_dir = "./test/usecase"
 
     if not os.path.exists(test_dir):
         os.makedirs(test_dir)
             
-    results = {
-        "runtime": [],
-        "app": [],
-        "cores": [],
-        "partitions": [],
-        "crawling-time": [],
-        "filter-time": [],
-        "map-time": [],
-        "split-time": [],
-        "reduce-time": [],
-        "analysis-time": [],
-        "visualization-time": [],
-        "fiter-reduce-time": [],
-        "total-execution-time": [],
-        "total-time": [],
-        "test": [],
-    }
+    results_columns = [
+        "runtime",
+        "app",
+        "cores",
+        "partitions",
+        "crawling-time",
+        "filter-time",
+        "map-time",
+        "split-time",
+        "reduce-time",
+        "analysis-time",
+        "visualization-time",
+        "fiter-reduce-time",
+        "total-execution-time",
+        "total-time",
+        "test",
+    ]
     
-    result_df = pd.DataFrame(results)
+    result_df = pd.DataFrame(columns=results_columns)
     
     
     for app in use_cases:
@@ -76,7 +75,7 @@ if __name__ == '__main__':
                 total_time = 0
 
                 for test_index in range(0, test_num):
-                    print(f"Starting app {app} using {cores} cores ({test_index})...")
+                    print(f"Starting app {app} using {cores} cores (test #{test_index})...")
                 
                     app_logs_dir = f"{test_logs_dir}/{app}/{cores}cores.test{test_index}"
                     if not os.path.exists(app_logs_dir):
@@ -94,6 +93,7 @@ if __name__ == '__main__':
                                 fields = report_line.split(";")
                                 
                                 result_df.loc[len(result_df)] = [type(runtime).__name__, app, cores]+fields[0:11]+[test_index]
-                                result_df.to_excel(test_results_file, index=False)
+                                result_df.to_excel(f"{test_results_file}.xlsx", index=False)
+                                result_df.to_excel(f"{test_results_file}.csv", index=False)
                         except: 
                             pass
