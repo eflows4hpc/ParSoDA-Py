@@ -13,19 +13,14 @@ permissions:
   contents: read
 
 jobs:
+
   integration_tests:
     runs-on: ubuntu-latest
-    container:
-      image: svgiampa/parsoda:latest
     steps:
     - uses: actions/checkout@v3
-    - name: Install requirements
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -r 'requirements-test.txt'
-    - name: Tests with unittest
-      run: |
-        python3 -m unittest -v
-    - name: Build test
-      run: |
-        python3 -m pip install .
+    - name: Build Docker image
+      run: docker build -t local .
+    - name: Run unit tests
+      run: docker run -it local -w /parsoda python3 -m unittest -v
+    - name: Run build tests
+      run: docker run -it local -w /parsoda python3 -m pip install .
