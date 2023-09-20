@@ -1,5 +1,5 @@
 # ParSoDA-Py
-This project is a redesign of the ParSoDA java library to the python environment. 
+This project is a redesign of the ParSoDA java library for the Python environment. 
 ParSoDA has been extended to support multiple execution runtimes. Specifically, according to the bridge design pattern, we defined the ParsodaDriver interface (i.e., the implementor of the bridge pattern) that allows a developer to implement adapters for different execution systems. A valid instance of ParsodaDriver must invoke some function that exploits some parallel pattern, such as Map, Filter, ReduceByKey and SortByKey. The SocialDataApp class is the abstraction of the bridge pattern and is designed to use these parallel patterns efficiently for running ParSoDA applications. It is worth noting that the execution flow of an application remains unchanged even by changing the execution runtime, which allows to run ParSoDA applications on different execution runtimes without modifying their code at all.
 
 # Dependencies
@@ -101,13 +101,13 @@ For defining a new use case, the developer must follow the next steps:
         ...
 
 ## Defining a new test runtime
-A test runtime allow to define a specific configuration for an underlying ParSoDA runtime (e.g. a specific configuration of the COMPSs environment), just for performace testing purposes.
+A test runtime allows to define a specific configuration for an underlying ParSoDA runtime (e.g. a specific configuration of the COMPSs environment), just for performace testing purposes.
 
 If you want test the ParSoDA libray, most likely you want to define your own test runtime and run one or more of the already defined use-cases.
 
 For defining a new test runtime you must follow these steps:
 
-1. create an .py file in "test/runtime" or append your runtime definition to one of the already existing ones (possibily except the "test_runtime.py" file, which defines the TestRuntime abstract type);
+1. create a .py file in "test/runtime" or append your runtime definition to one of the already existing ones (possibily except the "test_runtime.py" file, which defines the TestRuntime abstract type);
 2. define your runtime as a class with just one "run(self, app, chunk_size, cores, log_file_path)" method. The class must extend the test.runtime.test_runtime.TestRuntime as in the next example:
 
         class PyCompssScalabTestRuntime(TestRuntime):    
@@ -123,5 +123,42 @@ For defining a new test runtime you must follow these steps:
             return exit_code
 
 Note that the run method, just invokes a shell command submitting the "app" (that is the selected use-case) and setting up the environment with the given parameters.
+
+# Docker containers
+For testing ParSoDA a Docker container can be created.
+In order to build the Docker image run the following command in the root of this repository:
+
+    docker build . -t "<your image name>"
+
+The image comes out with many installed packages and tools, including the following:
+-   "pyspark" and "pycompss" pip packages
+-   Gradle and OpenJDK 1.8
+-   Git
+
+NB: PyCOMPSs is alredy configured and usable for creating a cluster of containers.
+NB: pyspark package could not be used for creating a cluster of containers, it requires some additional configuration or a new image.
+
+# Create a test container
+You can create the testing container by setting up the following docker stack:
+
+    version: '3'
+    services:
+        app:
+            image: <your image name>
+            restart: unless-stopped
+
+# Create a container for supporting the development of ParSoDA-Py
+If you want support the ParSoDA development you could create the development container by mounting the directory of the parsoda project in the /app directory and install ParSoDA-Py through pip in the container, with some docker stack similare to the following:
+
+    version: '3'
+    services:
+        app:
+            image: <your image name>
+            volumes:
+                - "/path/to/parsoda_project:/parsoda"
+                - "/path/to/your/id_rsa:/root/.ssh/id_rsa" # access a remote fork of ParSoDA-Py
+            restart: unless-stopped
+
+            
 
 

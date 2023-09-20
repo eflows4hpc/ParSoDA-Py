@@ -21,7 +21,7 @@ setup(
     url = "https://github.com/eflows4hpc/parsoda",
     packages=["parsoda"],
     python_requires=">=3.8.0",
-    install_requires=list_from_file("requirements.txt"),
+    #install_requires=list_from_file("requirements.txt"),
     long_description=text_from_file("README.md"),
     long_description_content_type='text/markdown',
     license_files = ("LICENSE"),

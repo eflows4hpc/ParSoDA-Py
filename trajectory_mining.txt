@@ -1,0 +1,6 @@
+
+
+Sequential Pattern Mining:
+[Trajectory]          [Support]
+
+

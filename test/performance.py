@@ -7,13 +7,13 @@ import pandas as pd
 import test.runtime as rt
 
 
-runtimes: List[rt.TestRuntime] = [rt.PyCompssScalabTestRuntime(), rt.PySparkScalabTestRuntime()]
+runtimes: List[rt.TestRuntime] = [rt.PySparkDev(), rt.PyCompssDev(),]
 use_cases = [
-    #"trajectory_mining_40m", 
-    "trajectory_mining_1m", 
+    "trajectory_mining_40m", 
+    #"trajectory_mining_1m", 
     #"emoji_polarization_pycompss",
 ]
-cores_list = [8]
+cores_list = [16]
 chunk_size = 64
 test_num = 1
 
@@ -55,6 +55,7 @@ if __name__ == '__main__':
             print(f"WARNING: application file \"{app_file}\" not found!")
 
     for runtime in runtimes:
+        rt_name = type(runtime).__name__
         for app in use_cases:
             app_file = Path(f"{apps_dir}/{app}.py")
             if not app_file.is_file:
@@ -75,13 +76,13 @@ if __name__ == '__main__':
                 total_time = 0
 
                 for test_index in range(0, test_num):
-                    print(f"Starting app {app} using {cores} cores (test #{test_index})...")
+                    print(f"Starting app {app} on {rt_name} using {cores} cores (test #{test_index})...")
                 
                     app_logs_dir = f"{test_logs_dir}/{app}/{cores}cores.test{test_index}"
                     if not os.path.exists(app_logs_dir):
                         os.makedirs(app_logs_dir)
                         
-                    log_file_path = f"{app_logs_dir}/{app}.cores{cores}.chunk{chunk_size}.test{test_index}.log"
+                    log_file_path = f"{app_logs_dir}/{rt_name}.cores{cores}.chunk{chunk_size}.test{test_index}.log"
                     
                     runtime: rt.TestRuntime   
                     exit_code = runtime.run(app_file, chunk_size, cores, log_file_path)
@@ -92,7 +93,7 @@ if __name__ == '__main__':
                                 report_line = f.readline()
                                 fields = report_line.split(";")
                                 
-                                result_df.loc[len(result_df)] = [type(runtime).__name__, app, cores]+fields[0:11]+[test_index]
+                                result_df.loc[len(result_df)] = [rt_name, app, cores]+fields[0:11]+[test_index]
                                 result_df.to_excel(f"{test_results_file}.xlsx", index=False)
                                 result_df.to_excel(f"{test_results_file}.csv", index=False)
                         except: 
