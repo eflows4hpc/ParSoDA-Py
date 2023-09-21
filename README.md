@@ -148,7 +148,7 @@ You can create the testing container by setting up the following docker stack:
             restart: unless-stopped
 
 # Create a container for supporting the development of ParSoDA-Py
-If you want support the ParSoDA development you could create the development container by mounting the directory of the parsoda project in the /app directory and install ParSoDA-Py through pip in the container, with some docker stack similare to the following:
+If you want support the ParSoDA development you could create the development container by mounting the directory of the parsoda project in the /parsoda directory, with a Docker stack similar to the following:
 
     version: '3'
     services:
