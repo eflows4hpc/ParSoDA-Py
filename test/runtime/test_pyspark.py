@@ -27,6 +27,7 @@ class PySparkDev(TestRuntime):
             f"{app} pyspark --chunk-size {chunk_size} "
             f"> {log_file_path}"
         )
+        os.remove("parsoda_src.zip")
         return exit_code
     
 class PySparkScalab(TestRuntime):    
@@ -54,4 +55,5 @@ class PySparkScalab(TestRuntime):
             f"{app} pyspark --chunk-size {chunk_size} "
             f"> {log_file_path}"
         )
+        os.remove("parsoda_src.zip")
         return exit_code
