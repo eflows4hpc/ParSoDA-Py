@@ -21,7 +21,8 @@ if __name__ == '__main__':
         ],
         rois_file="./resources/input/RomeRoIs.kml",
         num_partitions=test.partitions, 
-        chunk_size=test.chunk_size
+        chunk_size=test.chunk_size,
+        visualization_file="./resources/output/trajectory_mining.txt"
     )
     app.execute()
     
