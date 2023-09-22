@@ -9,7 +9,7 @@ on:
           - 'resources/input/**'
           - 'Dockerfile'
           - 'requirements**'
-          - '.github/continuous-delivery.yml'
+          - '.github/workflows/continuous-delivery.yml'
     pull_request:
         branches: [ "main" ]
         paths:
@@ -18,7 +18,7 @@ on:
           - 'resources/input/**'
           - 'Dockerfile'
           - 'requirements**'
-          - '.github/continuous-delivery.yml'
+          - '.github/workflows/continuous-delivery.yml'
 
 permissions:
   contents: read
@@ -44,5 +44,5 @@ jobs:
             uses: docker/build-push-action@v5
             with:
                 push: true
-                tags: ${{ secrets.DOCKERHUB_USERNAME }}/parsoda:latest
+                tags: ${{ secrets.DOCKER_USERNAME }}/parsoda:latest
                 
