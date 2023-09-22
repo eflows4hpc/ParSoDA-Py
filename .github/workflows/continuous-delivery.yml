@@ -45,3 +45,4 @@ jobs:
             with:
                 push: true
                 tags: ${{ secrets.DOCKERHUB_USERNAME }}/parsoda:latest
+                
