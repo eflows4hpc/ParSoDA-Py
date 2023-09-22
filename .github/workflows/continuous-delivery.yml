@@ -2,7 +2,16 @@ name: Continuous Delivery
 
 on:
     schedule:
-        - cron: "26 14 * * *"
+        - cron: "00 00 * * *"
+    push:
+        branches: [ "main" ]
+        paths:
+        - 'parsoda/**'
+        - 'test/**'
+        - 'resources/input/**'
+        - 'Dockerfile'
+        - 'requirements**'
+        - '.github/continuous-delivery.yml'
 
 permissions:
   contents: read
