@@ -136,6 +136,7 @@ The image comes out with many installed packages and tools, including the follow
 -   Git
 
 NB: PyCOMPSs is alredy configured and usable for creating a cluster of containers.
+
 NB: pyspark package could not be used for creating a cluster of containers, it requires some additional configuration or a new image.
 
 # Create a test container
