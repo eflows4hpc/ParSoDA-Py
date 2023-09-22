@@ -3,8 +3,22 @@ name: Continuous Delivery
 on:
     push:
         branches: [ "main" ]
+        paths:
+          - 'parsoda/**'
+          - 'test/**'
+          - 'resources/input/**'
+          - 'Dockerfile'
+          - 'requirements**'
+          - '.github/continuous-delivery.yml'
     pull_request:
         branches: [ "main" ]
+        paths:
+          - 'parsoda/**'
+          - 'test/**'
+          - 'resources/input/**'
+          - 'Dockerfile'
+          - 'requirements**'
+          - '.github/continuous-delivery.yml'
 
 permissions:
   contents: read
