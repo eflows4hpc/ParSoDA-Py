@@ -30,6 +30,4 @@ class ClassifyByEmoji(Mapper[str, int]):
             if emo in self.emojis:
                 sum_polarity += self.emojis[emo]
 
-        item.extras['emoji_polarity'] = sum_polarity
-
         return [(item.user_id, sum_polarity)]

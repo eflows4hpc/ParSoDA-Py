@@ -13,7 +13,15 @@ def random_string(length: int):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 
 def random_text():
-    return random_string(30)
+    text = random_string(25)
+    
+    # add some emoji (useful for emoji polarization)
+    if random.random() < 0.5:
+        if random.random() < 0.5:
+            text = text + "😀"      # grinning
+        else:
+            text = text + "😠"      # angry
+    return text
 
 def random_tags(length: int):
     num_chars = len(str(length))
@@ -23,15 +31,20 @@ def random_tags(length: int):
     return list(tags)
 
 def estimated_item_size(rois):
-    item = random_item(0, 100, random_tags(1000), rois)
-    return len(item.to_json())
+    mean_size = 0
+    for i in range(100):
+        item = random_item(0, 100, random_tags(1000), rois)
+        mean_size += len(item.to_json())
+    return mean_size/100
         
 
 def random_item(id, users: int, tags: List[str], rois: List[RoI], builder = SocialDataItemBuilder()):
     user_id = random.randrange(0, users)
-    tag1 = tags[random.randrange(0, len(tags))]
-    tag2 = tags[random.randrange(0, len(tags))]
-    tag3 = tags[random.randrange(0, len(tags))]
+    
+    if random.random() < 0.7:
+        item_tags = [tags[random.randrange(0, len(tags))] for i in range(3)]
+    else:
+        item_tags = []
     roi = rois[random.randrange(0, len(rois))]
     roi_centroid = roi.get_center()
     
@@ -41,8 +54,8 @@ def random_item(id, users: int, tags: List[str], rois: List[RoI], builder = Soci
         .set_user_id(user_id) \
         .set_user_name(f"{user_id:010}") \
         .set_date_posted(datetime.fromtimestamp(random.randrange(1499097285,1688399653))) \
-        .set_text(random_string(30)) \
-        .set_tags([tag1, tag2, tag3]) \
+        .set_text(random_text()) \
+        .set_tags(item_tags) \
         .set_location(roi_centroid.x, roi_centroid.y) \
         .build()
 
