@@ -9,7 +9,7 @@ on:
       - 'resources/input/**'
       - 'Dockerfile'
       - 'requirements**'
-      - '.github/continuous-integration.yml'
+      - '.github/workflows/continuous-integration.yml'
   pull_request:
     branches: [ "main" ]
     paths:
@@ -18,7 +18,7 @@ on:
       - 'resources/input/**'
       - 'Dockerfile'
       - 'requirements**'
-      - '.github/continuous-integration.yml'
+      - '.github/workflows/continuous-integration.yml'
 
 permissions:
   contents: read
