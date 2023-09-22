@@ -3,8 +3,22 @@ name: Continuous Integration
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'parsoda/**'
+      - 'test/**'
+      - 'resources/input/**'
+      - 'Dockerfile'
+      - 'requirements**'
+      - '.github/continuous-integration.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'parsoda/**'
+      - 'test/**'
+      - 'resources/input/**'
+      - 'Dockerfile'
+      - 'requirements**'
+      - '.github/continuous-integration.yml'
 
 permissions:
   contents: read
