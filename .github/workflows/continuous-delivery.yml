@@ -2,7 +2,7 @@ name: Continuous Delivery
 
 on:
     schedule:
-        - cron: "20 16 * * *"
+        - cron: "26 14 * * *"
 
 permissions:
   contents: read
