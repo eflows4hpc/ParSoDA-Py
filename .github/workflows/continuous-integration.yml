@@ -9,6 +9,7 @@ on:
       - 'resources/input/**'
       - 'Dockerfile'
       - 'requirements**'
+      - '.github/**'
   pull_request:
     branches: [ "main" ]
     paths:
@@ -17,6 +18,7 @@ on:
       - 'resources/input/**'
       - 'Dockerfile'
       - 'requirements**'
+      - '.github/**'
 
 permissions:
   contents: read
