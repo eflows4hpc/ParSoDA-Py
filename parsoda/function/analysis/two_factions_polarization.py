@@ -10,7 +10,7 @@ class TwoFactionsPolarization(Analyzer):
         positives = 0
         negatives = 0
         for user in list(data.items()):
-            if user[1] >= 0:
+            if user[1] > 0:
                 positives += 1
             else:
                 negatives += 1

@@ -24,6 +24,8 @@ class ClassifyByEmoji(Mapper[str, int]):
 
         # prendiamo le emoji del post
         item_emojis = get_emojis(item.text)
+        
+        # for e, p in self.emojis
 
         # calcoliamo la polarità in base alle emoji
         for emo in item_emojis:

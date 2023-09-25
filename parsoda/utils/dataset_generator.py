@@ -12,15 +12,24 @@ from roi import RoI, load_RoIs
 def random_string(length: int):
     return ''.join(random.choice(string.ascii_lowercase) for i in range(length))
 
-def random_text():
+def random_text(emoji_prob: float = 0.8, emoji_positive_prob: float = 0.7):
+    """Generate a random text for a social data item
+
+    Args:
+        emoji_prob (float, optional): The probability that the text will have an emoji. Defaults to 0.5.
+        emoji_positive_prob (float, optional): the probability that the eventual emoji is positive. Defaults to 0.5.
+
+    Returns:
+        _type_: _description_
+    """
     text = random_string(25)
     
     # add some emoji (useful for emoji polarization)
-    if random.random() < 0.5:
-        if random.random() < 0.5:
-            text = text + "😀"      # grinning
+    if random.random() < emoji_prob:
+        if random.random() < emoji_positive_prob:
+            text = text + "👏"      # clap: +3
         else:
-            text = text + "😠"      # angry
+            text = text + "😠"      # angry: -3
     return text
 
 def random_tags(length: int):

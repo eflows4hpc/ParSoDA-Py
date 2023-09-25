@@ -11,29 +11,33 @@ from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
 from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
 
+    
+def trajectory_mining_testcase(driver):
+    app = parsoda_trajectory_mining(
+        driver = driver,
+        crawlers = [
+            LocalFileCrawler('resources/input/test.json', ParsodaParser())
+        ],
+        rois_file="./resources/input/RomeRoIs.kml",
+        visualization_file="./resources/output/trajectory_mining.txt"
+    )
+    report = app.execute()
+    return report.get_reduce_result_length()
 
 class TestTrajectoryMining(unittest.TestCase):
+    expected_reduce_len: int = 0
     
-    def trajectory_mining_testcase(self, driver):
-        app = parsoda_trajectory_mining(
-            driver = driver,
-            crawlers = [
-                LocalFileCrawler('resources/input/test.json', ParsodaParser())
-            ],
-            rois_file="./resources/input/RomeRoIs.kml",
-            visualization_file="./resources/output/trajectory_mining.txt"
-        )
-        report = app.execute()
-        self.assertEqual(report.get_reduce_result_length(), 1755)
-    
-    def test_singlecore(self):
-        self.trajectory_mining_testcase(ParsodaSingleCoreDriver())
+    @classmethod
+    def setUpClass(cls):
+        cls.expected_reduce_len = trajectory_mining_testcase(ParsodaSingleCoreDriver())
         
     def test_pyspark(self):
         ctx = pyspark.SparkContext(master="local[*]")
-        self.trajectory_mining_testcase(ParsodaPySparkDriver(spark_context=ctx))
+        computed_reduce_len = trajectory_mining_testcase(ParsodaPySparkDriver(spark_context=ctx))
         ctx.stop()
+        self.assertEqual(computed_reduce_len, TestTrajectoryMining.expected_reduce_len)
         
     def test_pycompss(self):
-        self.trajectory_mining_testcase(ParsodaPyCompssDriver())
+        computed_reduce_len = trajectory_mining_testcase(ParsodaPyCompssDriver())
+        self.assertEqual(computed_reduce_len, TestTrajectoryMining.expected_reduce_len)
         

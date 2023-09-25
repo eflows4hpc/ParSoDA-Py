@@ -5,7 +5,7 @@ from parsoda.model import Reducer
 
 class ReduceByEmojiPolarity(Reducer[str, int, Optional[int]]):
 
-    def __init__(self, min_polarity_threshold: int = 1):
+    def __init__(self, min_polarity_threshold: int = -100):
         self.min_polarity_threshold = min_polarity_threshold
 
     def reduce(self, key: str, polarities: List[int]) -> Optional[int]:
