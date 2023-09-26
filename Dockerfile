@@ -50,7 +50,7 @@ RUN python3 -m pip install "pycompss==3.1" -v
 RUN echo ". /etc/profile.d/compss.sh" >> /root/.bashrc
 
 # install apps requirements
-COPY ./requirements-apps.txt /requirements-apps.txt
+COPY ./requirements.txt /requirements.txt
 RUN python3 -m pip install -r "/requirements.txt"
 
 # install test requirements
