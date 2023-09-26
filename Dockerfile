@@ -51,7 +51,7 @@ RUN echo ". /etc/profile.d/compss.sh" >> /root/.bashrc
 
 # install apps requirements
 COPY ./requirements-apps.txt /requirements-apps.txt
-RUN python3 -m pip install -r "/requirements-apps.txt"
+RUN python3 -m pip install -r "/requirements.txt"
 
 # install test requirements
 COPY ./requirements-test.txt /requirements-test.txt

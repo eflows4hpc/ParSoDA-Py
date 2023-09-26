@@ -3,9 +3,10 @@ import unittest
 import pyspark
 
 from parsoda.apps.trajectory_mining import parsoda_trajectory_mining
+from parsoda.function.crawling.distributed_file_crawler import DistributedFileCrawler
 
-from parsoda.function.crawling.local_file_crawler import LocalFileCrawler
 from parsoda.function.crawling.parsing.parsoda_parser import ParsodaParser
+from parsoda.model.driver.parsoda_multiprocessing_driver import ParsodaMultiprocessingDriver
 
 from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
@@ -16,10 +17,11 @@ def trajectory_mining_testcase(driver):
     app = parsoda_trajectory_mining(
         driver = driver,
         crawlers = [
-            LocalFileCrawler('resources/input/test.json', ParsodaParser())
+            DistributedFileCrawler('resources/input/test.json', ParsodaParser())
         ],
         rois_file="./resources/input/RomeRoIs.kml",
-        visualization_file="./resources/output/trajectory_mining.txt"
+        visualization_file="./resources/output/trajectory_mining.txt",
+        chunk_size=1,
     )
     report = app.execute()
     return report.get_reduce_result_length()
@@ -39,5 +41,9 @@ class TestTrajectoryMining(unittest.TestCase):
         
     def test_pycompss(self):
         computed_reduce_len = trajectory_mining_testcase(ParsodaPyCompssDriver())
+        self.assertEqual(computed_reduce_len, TestTrajectoryMining.expected_reduce_len)
+        
+    def test_multiprocessing(self):
+        computed_reduce_len = trajectory_mining_testcase(ParsodaMultiprocessingDriver())
         self.assertEqual(computed_reduce_len, TestTrajectoryMining.expected_reduce_len)
         

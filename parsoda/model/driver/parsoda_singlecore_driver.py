@@ -25,7 +25,7 @@ class ParsodaSingleCoreDriver(ParsodaDriver):
 
     def crawl(self, crawlers: List[Crawler]):
         for crawler in crawlers:
-            partitions = crawler.get_partitions(1)
+            partitions = crawler.get_partitions(num_of_partitions=self.num_partitions, partition_size=self.chunk_size)
             for p in partitions:
                 for item in p.load_data().parse_data():
                     self.dataset.append(item)

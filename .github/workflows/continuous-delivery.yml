@@ -28,6 +28,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - 
+            name: Create current version based on time
+            id: versioning
+            run: |
+                echo "::set-output name=version::$(date +'%Y%m%d-%H%M%S' --utc)"
+        - 
             name: Set up QEMU
             uses: docker/setup-qemu-action@v3
         - 
@@ -44,5 +49,5 @@ jobs:
             uses: docker/build-push-action@v5
             with:
                 push: true
-                tags: ${{ secrets.DOCKER_USERNAME }}/parsoda:latest
+                tags: ${{secrets.DOCKER_USERNAME}}/parsoda:latest, ${{secrets.DOCKER_USERNAME}}/parsoda:${{steps.versioning.outputs.version}}
                 

@@ -3,6 +3,12 @@ from typing import Callable, Iterable, Any, List
 
 from parsoda.model.function.crawler import Crawler
 
+class _flatmapper():
+    def __init__(self, mapper):
+        self.mapper = mapper
+    def __call__(self, item):
+        return [self.mapper(item)]
+    
 
 class ParsodaDriver(ABC):
     """
@@ -77,7 +83,7 @@ class ParsodaDriver(ABC):
         :param mapper: the (object -> list[(K,V)]) mapping function to apply
         :return: None
         """
-        self.flatmap(lambda item: [mapper(item)])
+        self.flatmap(_flatmapper(mapper))
 
     #TODO: documentation
     def group_by_key(self) -> None:

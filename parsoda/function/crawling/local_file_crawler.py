@@ -47,7 +47,6 @@ class LocalFilePartition(CrawlerPartition, ABC):
                 data.append(text_line)
         self.__text_lines = data
         self.__loaded = True
-        
         self.__file = None
         
         # clear the file handle, which is not useful anymore

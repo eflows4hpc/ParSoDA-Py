@@ -163,6 +163,23 @@ R = TypeVar("R")  # reduction output type (might be equal to V)
 A = TypeVar("A")  # analysis output type
 SORTABLE_KEY = TypeVar("SORTABLE_KEY", bound=SupportsLessThan)  # generic types that supports the "less than" operator
 
+def _filter_none(item):
+    return item is not None
+
+class _sort_kvs():
+    def __init__(self, secondary_key):
+        self.__secondary_key = secondary_key
+    def __call__(self, kvs):
+        return (kvs[0], sorted(kvs[1], key=self.__secondary_key))
+
+class _reduce():
+    def __init__(self, reducer):
+        self.__reducer = reducer
+    def __call__(self, kv):
+        return (kv[0], self.__reducer.reduce(kv[0], kv[1]))
+
+def _filter_kv_none(kv):
+    return kv[1] is not None
 
 class SocialDataApp(Generic[K, V, R, A]):
 
@@ -294,7 +311,7 @@ class SocialDataApp(Generic[K, V, R, A]):
         crawling_time = stopwatch.get_and_reset()
         
         print(f"[ParSoDA/{self.__app_name}] filtering \"None\" values...")
-        driver.filter(lambda item: item is not None)
+        driver.filter(_filter_none)
 
         # item1, item2, item3, item4, ...
 
@@ -319,18 +336,19 @@ class SocialDataApp(Generic[K, V, R, A]):
         # sort values (optional)
         if secondary_key is not None:
             print(f"[ParSoDA/{self.__app_name}] secondary sorting...")
-            driver.map(lambda kv: (kv[0], sorted(kv[1], key=secondary_key)))
+            driver.map(_sort_kvs(secondary_key))
+        
             
         split_time = stopwatch.get_and_reset()
 
         print(f"[ParSoDA/{self.__app_name}] reducing...")
-        driver.map(lambda kv: (kv[0], reducer.reduce(kv[0], kv[1])))
+        driver.map(_reduce(reducer))
 
         # k1 -> r1, k2 -> r2, k3 -> r3, ...
 
         print(f"[ParSoDA/{self.__app_name}] filtering \"None\" values...")
-        driver.filter(lambda kv: kv[1] is not None)
-
+        driver.filter(_filter_kv_none)
+        
         # k1 -> r1, k3 -> r3, k6 -> r6, ...
 
         print(f"[ParSoDA/{self.__app_name}] collecting reduction results...")

@@ -10,6 +10,9 @@ from parsoda.function.visualization.sort_gap_bide import SortGapBIDE
 from parsoda.model.driver.parsoda_driver import ParsodaDriver
 from parsoda.model.function.crawler import Crawler
 
+# do not use lambda, they cannot be pickled
+def __secondary_key(x):
+    return x[0]
 
 def parsoda_trajectory_mining(
     driver: ParsodaDriver,
@@ -31,7 +34,7 @@ def parsoda_trajectory_mining(
         IsInRoI(rois_file)
     ])
     app.set_mapper(FindPoI(rois_file))
-    app.set_secondary_sort_key(lambda x: x[0])
+    app.set_secondary_sort_key(__secondary_key)
     app.set_reducer(ReduceByTrajectories(min_trajectory_length))
     app.set_analyzer(GapBIDE(min_support, min_gap, max_gap))
     app.set_visualizer(
