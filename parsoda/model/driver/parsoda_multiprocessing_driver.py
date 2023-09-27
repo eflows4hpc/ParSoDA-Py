@@ -13,7 +13,6 @@ def _task_load(p: CrawlerPartition):
     return p.load_data().parse_data()
 
 def _task_filter(filter_func, partition: List):
-    #print(f"_task_filter: partition={partition}")
     filtered_partition = []
     for item in partition:
         if filter_func(item):
@@ -25,20 +24,6 @@ def _task_map(mapper, partition: List):
     for item in partition:
         mapped_partition.extend(mapper(item))
     return mapped_partition
-
-def _task_sort(partition: List, key=lambda kv: kv[0]):
-    partition.sort()
-    return partition
-
-def _task_reduce(reducer, partition: List[Tuple]):
-    reduce_result = Dict()
-    for kv in partition:
-        k, v = kv[0], kv[1]
-        if k in reduce_result:
-            reduce_result[k] = reducer(reduce_result[k], v)
-        else:
-            reduce_result[k] = v
-    return reduce_result
 
 def _task_group(partition: List[Tuple])->Dict:
     result = {}
@@ -119,8 +104,6 @@ class ParsodaMultiprocessingDriver(ParsodaDriver):
     def flatmap(self, mapper):
         mapped_partitions = []
         futures = []
-        
-        #self.__dataset = self.__pool.map(_task_map, self.__dataset, 1)
 
         for p in self.__dataset:
             future = self.__pool.apply_async(_task_map, (mapper, p))
@@ -146,17 +129,7 @@ class ParsodaMultiprocessingDriver(ParsodaDriver):
         for p in grouped_partitions:
             combine(accumulator, p)
             
-
-        # for p in self.__dataset:
-        #     future = self.__pool.apply_async(_task_group, (p,))
-        #     futures.append(future)
-
-        # accumulator = {}
-        # for future in futures:
-        #     grouped_partition: dict = future.get()
-        #     combine(accumulator, grouped_partition)
         result = [(k,v) for k, v in accumulator.items()]
-        print(f"grouped={result}")
         self.__partitioning(result)
 
     def get_result(self):

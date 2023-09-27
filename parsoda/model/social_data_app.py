@@ -359,15 +359,6 @@ class SocialDataApp(Generic[K, V, R, A]):
         
         reduction_result_length = len(reduction_result)
         print(f"[ParSoDA/{self.__app_name}] len(reduction_result)={reduction_result_length}")
-
-        # reduction_data_len = 0
-        # for k, v in reduction_result.items():
-        #     reduction_data_len += 1
-        #     if isinstance(v, Iterable):
-        #         reduction_data_len += len(v)
-        #     else:
-        #         reduction_data_len += 1
-        # print(f"[ParSoDA/{self.__app_name}] all reduction results (keys and values)={reduction_data_len}")
         stopwatch.reset()
 
         print(f"[ParSoDA/{self.__app_name}] disposing driver...")
