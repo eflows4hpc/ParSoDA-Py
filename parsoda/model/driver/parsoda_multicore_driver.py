@@ -1,158 +1,144 @@
 import multiprocessing
+from multiprocessing.pool import AsyncResult
 import os
-from typing import Callable, TypeVar, Optional, List, Tuple, Dict
+import queue
+from typing import Optional, List, Tuple, Dict
 
-from parsoda import SocialDataItem
 from parsoda.model import ParsodaDriver, Crawler, Filter, Mapper, Reducer
-from concurrent.futures import ThreadPoolExecutor
-import time
+from multiprocessing import Pool
 
-# TODO: use python multiprocessing instead of threading
+from parsoda.model.function.crawler import CrawlerPartition
+
+def _task_load(p: CrawlerPartition):
+    return p.load_data().parse_data()
+
+def _task_filter(filter_func, partition: List):
+    filtered_partition = []
+    for item in partition:
+        if filter_func(item):
+            filtered_partition.append(item)
+    return filtered_partition
+
+def _task_map(mapper, partition: List):
+    mapped_partition = []
+    for item in partition:
+        mapped_partition.extend(mapper(item))
+    return mapped_partition
+
+def _task_group(partition: List[Tuple])->Dict:
+    result = {}
+    for k, v in partition:
+        if k in result:
+            result[k].append(v)
+        else:
+            result[k] = [v]
+    return result
+
 class ParsodaMultiCoreDriver(ParsodaDriver):
 
     def __init__(self, parallelism: int = -1):
-        self.__parallelism = parallelism
+        self.__parallelism = parallelism if parallelism>0 else multiprocessing.cpu_count()
         self.__dataset: Optional[list] = None
         self.__num_partitions = parallelism if parallelism>0 else multiprocessing.cpu_count()
-        self.__thread_pool: Optional[ThreadPoolExecutor] = None
+        self.__chunk_size = 0
+        self.__pool: Pool = None
 
     def init_environment(self):
         self.__dataset = []
-        self.__thread_pool = ThreadPoolExecutor(max_workers=self.__parallelism)
+        self.__pool = multiprocessing.Pool(self.__parallelism)
 
     def set_num_partitions(self, num_partitions):
         self.__num_partitions = num_partitions
+        
+    def set_chunk_size(self, chunk_size):
+        self.__chunk_size = chunk_size
+    
+    def __partitioning(self, merged):
+        if self.__num_partitions is None or self.__num_partitions <= 0:
+            chunk_size = self.__chunk_size if self.__chunk_size>0 else 64
+            num_of_partitions = len(merged) // chunk_size
+            chunk_sizes = [chunk_size]*num_of_partitions
+            reminder = len(merged) % chunk_size
+            if reminder > 0:
+                num_of_partitions += 1
+                chunk_sizes.append(reminder)
+        else:
+            num_of_partitions = self.__num_partitions
+            chunk_sizes = [len(merged) // num_of_partitions]*num_of_partitions
+            reminder = len(merged) % num_of_partitions
+            for i in range(reminder):
+                chunk_sizes[i] += 1
+        
+        partitions = []
+        start = 0
+        for i in range(0, num_of_partitions):
+            p = merged[start : start+chunk_sizes[i]]
+            partitions.append(p)
+            start += chunk_sizes[i]
+        self.__dataset = partitions
 
     def crawl(self, crawlers: List[Crawler]):
+        self.__pool: multiprocessing.Pool
         futures = []
         for crawler in crawlers:
-            crawler_partitions = crawler.get_partitions(self.__num_partitions)
+            crawler_partitions = crawler.get_partitions(self.__num_partitions, self.__chunk_size)
             for p in crawler_partitions:
-                future = self.__thread_pool.submit(lambda: p.load_data().parse_data())
+                future: AsyncResult = self.__pool.apply_async(func=_task_load, args=(p,))
                 futures.append(future)
 
         for future in futures:
-            self.__dataset.extend(future.result())
-
-    @staticmethod
-    def __define_partitions(dataset_size: int, num_partitions: int) -> List[Tuple[int, int]]:
-        chunk_size = int(dataset_size / num_partitions)
-        partitions = []
-        item_index = 0
-        while item_index < dataset_size:
-            start = item_index
-            end = int(min(start + chunk_size, dataset_size))
-            item_index = item_index + chunk_size
-            partitions.append((start, end))
-        return partitions
+            self.__dataset.append(future.get())
 
     def filter(self, filter_func):
-        filtered_items = []
+        filtered_partitions = []
         futures = []
 
-        def filter_task(dataset: List):
-            filtered_partition = []
-            for item in dataset:
-                if filter_func(item):
-                    filtered_partition.append(item)
-            return filtered_partition
-
-        for start, end in self.__define_partitions(len(self.__dataset), self.__num_partitions):
-            future = self.__thread_pool.submit(filter_task, self.__dataset[start:end])
+        for p in self.__dataset:
+            future = self.__pool.apply_async(_task_filter, (filter_func, p))
             futures.append(future)
 
         for future in futures:
-            filtered_items.extend(future.result())
-        self.__dataset = filtered_items
+            filtered_partitions.append(future.get())
+        self.__dataset = filtered_partitions
 
     def flatmap(self, mapper):
-        mapped_items = []
+        mapped_partitions = []
         futures = []
 
-        def map_task(dataset: List):
-            partition = []
-            for item_list in map(mapper, dataset):
-                partition.extend(item_list)
-            return partition
-
-        for start, end in self.__define_partitions(len(self.__dataset), self.__num_partitions):
-            future = self.__thread_pool.submit(map_task, self.__dataset[start:end])
+        for p in self.__dataset:
+            future = self.__pool.apply_async(_task_map, (mapper, p))
             futures.append(future)
 
         for future in futures:
-            mapped_items.extend(future.result())
-        self.__dataset = mapped_items
-
-    def sort_by_key(self) -> None:
-        sorted_items = []
+            mapped_partitions.append(future.get())
+        self.__dataset = mapped_partitions
+        
+    def group_by_key(self):
         futures = []
 
-        def merge(left: List, right: List, key=lambda kv: kv[0]):
-            merged = []
-            i, j = 0, 0
-            while i < len(left) and j < len(right):
-                if key(left[i]) <= key(right[j]):
-                    merged.append(left[i])
-                    i += 1
-                else:
-                    merged.append(right[j])
-                    j += 1
-            while i < len(left):
-                merged.append(left[i])
-                i += 1
-            while j < len(right):
-                merged.append(right[j])
-                j += 1
-            return merged
-
-        def sort_task(dataset: List, key=lambda kv: kv[0]):
-            dataset.sort()
-            return dataset
-
-        for start, end in self.__define_partitions(len(self.__dataset), self.__num_partitions):
-            future = self.__thread_pool.submit(sort_task, self.__dataset[start:end])
-            futures.append(future)
-
-        for future in futures:
-            sorted_partition = future.result()
-            sorted_items = merge(sorted_items, sorted_partition)
-        self.__dataset = sorted_items
-
-    def reduce_by_key(self, reducer):
-        reduced_items = {}
-        futures = []
-
-        def reduce(dataset: List[Tuple]):
-            reduce_result = Dict()
-            for kv in dataset:
-                k, v = kv[0], kv[1]
-                if k in reduce_result:
-                    reduce_result[k] = reducer(reduce_result[k], v)
-                else:
-                    reduce_result[k] = v
-            return reduce_result
-
-        def combine(accumulator: Dict, to_combine: Dict):
-            for k, v in to_combine.items():
+        def combine(accumulator: dict, partition: dict):
+            for k, vs in partition.items():
                 if k in accumulator:
-                    accumulator[k] = reducer(accumulator[k], v)
+                    accumulator[k].extend(vs)
                 else:
-                    accumulator[k] = v
-
-        for start, end in self.__define_partitions(len(self.__dataset), self.__num_partitions):
-            future = self.__thread_pool.submit(reduce, self.__dataset[start:end])
-            futures.append(future)
-
-        for future in futures:
-            reduced_partition = future.result()
-            combine(reduced_items, reduced_partition)
-
-        self.__dataset = list(reduced_items.items())
+                    accumulator[k] = vs
+                    
+        grouped_partitions = self.__pool.map(_task_group, self.__dataset, 1)
+        
+        accumulator = {}
+        for p in grouped_partitions:
+            combine(accumulator, p)
+            
+        result = [(k,v) for k, v in accumulator.items()]
+        self.__partitioning(result)
 
     def get_result(self):
-        return self.__dataset
+        result = []
+        for p in self.__dataset:
+            result.extend(p)
+        return result
 
     def dispose_environment(self):
         self.__dataset = None
-        self.__thread_pool.shutdown(wait=False)
-        self.__thread_pool = None
+        self.__pool.close()
+        self.__pool = None

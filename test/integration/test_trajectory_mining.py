@@ -6,7 +6,7 @@ from parsoda.apps.trajectory_mining import parsoda_trajectory_mining
 from parsoda.function.crawling.distributed_file_crawler import DistributedFileCrawler
 
 from parsoda.function.crawling.parsing.parsoda_parser import ParsodaParser
-from parsoda.model.driver.parsoda_multiprocessing_driver import ParsodaMultiprocessingDriver
+from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
 
 from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
@@ -44,6 +44,6 @@ class TestTrajectoryMining(unittest.TestCase):
         self.assertEqual(computed_reduce_len, TestTrajectoryMining.expected_reduce_len)
         
     def test_multiprocessing(self):
-        computed_reduce_len = trajectory_mining_testcase(ParsodaMultiprocessingDriver())
+        computed_reduce_len = trajectory_mining_testcase(ParsodaMultiCoreDriver())
         self.assertEqual(computed_reduce_len, TestTrajectoryMining.expected_reduce_len)
         

@@ -11,7 +11,7 @@ from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
 from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
 from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
-from parsoda.model.driver.parsoda_multiprocessing_driver import ParsodaMultiprocessingDriver
+from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
 
     
 def sentiment_analysis_testcase(driver):
@@ -45,6 +45,6 @@ class TestSentimentAnalysis(unittest.TestCase):
         self.assertEqual(computed_reduce_len, TestSentimentAnalysis.expected_reduce_len)
         
     def test_multiprocessing(self):
-        computed_reduce_len = sentiment_analysis_testcase(ParsodaMultiprocessingDriver())
+        computed_reduce_len = sentiment_analysis_testcase(ParsodaMultiCoreDriver())
         self.assertEqual(computed_reduce_len, TestSentimentAnalysis.expected_reduce_len)
         
