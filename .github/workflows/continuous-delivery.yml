@@ -31,7 +31,7 @@ jobs:
             name: Create current version based on time
             id: versioning
             run: |
-                echo "::set-output name=version::$(date +'%Y%m%d-%H%M%S' --utc)"
+                echo "::set-output name=version::$(date +'%Y-%m-%d' --utc)"
         - 
             name: Set up QEMU
             uses: docker/setup-qemu-action@v3
@@ -49,5 +49,5 @@ jobs:
             uses: docker/build-push-action@v5
             with:
                 push: true
-                tags: ${{secrets.DOCKER_USERNAME}}/parsoda:latest, ${{secrets.DOCKER_USERNAME}}/parsoda:${{steps.versioning.outputs.version}}
+                tags: ${{secrets.DOCKER_USERNAME}}/parsoda:${{steps.versioning.outputs.version}}, ${{secrets.DOCKER_USERNAME}}/parsoda:latest
                 
