@@ -15,15 +15,11 @@ from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriv
     
 def trajectory_mining_testcase(driver):
     app = parsoda_trajectory_mining(
-        driver = driver,
-        crawlers = [
-            DistributedFileCrawler('resources/input/test.json', ParsodaParser())
-        ],
+        crawlers=[DistributedFileCrawler('resources/input/test.json', ParsodaParser())],
         rois_file="./resources/input/RomeRoIs.kml",
-        visualization_file="./resources/output/trajectory_mining.txt",
-        chunk_size=1,
+        visualization_file="./resources/output/trajectory_mining.txt"
     )
-    report = app.execute()
+    report = app.execute(driver, chunk_size=1)
     return report.get_reduce_result_length()
 
 class TestTrajectoryMining(unittest.TestCase):

@@ -12,19 +12,16 @@ from parsoda.model.driver.parsoda_pycompss_driver import ParsodaPyCompssDriver
 from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
 from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
 from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
+from parsoda.model.social_data_app import SocialDataApp
 
     
 def sentiment_analysis_testcase(driver):
-    app = parsoda_sentiment_analysis(
-        driver = driver,
-        crawlers = [
-            DistributedFileCrawler('resources/input/test.json', ParsodaParser())
-        ],
+    app: SocialDataApp = parsoda_sentiment_analysis(
+        crawlers=[DistributedFileCrawler('resources/input/test.json', ParsodaParser())],
         emoji_file="./resources/input/emoji.json",
         visualization_file="./resources/output/sentiment_analysis.txt",
-        chunk_size=1
     )
-    report = app.execute()
+    report = app.execute(driver, chunk_size=1)
     return report.get_reduce_result_length()
 
 class TestSentimentAnalysis(unittest.TestCase):
