@@ -93,12 +93,13 @@ For defining a new use case, the developer must follow the next steps:
 1. create a new runnable script in "test/usecase" directory;
 2.  import the test.usecase.parsoda_usecase_parameters.ParsodaUseCaseParameters;
 3.  load test parameters by simply creating a new ParsodaUseCaseParameters object and accessing its properties;
-4.  create and run the lication with hard-coded algorithm input parameters:
+4.  create and run the application with hard-coded algorithm input parameters:
 
         test = ParsodaUseCaseParameters()
-        app = SocialDataApp("App Name", test.driver, test.partitions, test.chunk_size)
+        app = SocialDataApp("App Name")
         app.set_crawlers([DistributedFileCrawler("hard-coded/path/to/a_dataset", TwitterParser())])
         ...
+        app.execute(test.driver, test.partitions, test.chunk_size)
 
 ## Defining a new test runtime
 A test runtime allows to define a specific configuration for an underlying ParSoDA runtime (e.g. a specific configuration of the COMPSs environment), just for performace testing purposes.
