@@ -4,6 +4,7 @@ from optparse import Values
 from typing import Iterable, TypeVar, Generic, Any, Callable, Protocol, Optional, List, Dict
 
 from parsoda.model.driver.parsoda_driver import ParsodaDriver
+from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
 from parsoda.model.function.crawler import Crawler
 from parsoda.model.function.visualizer import Visualizer
 from parsoda.model import Filter, Mapper, Reducer, Analyzer
@@ -183,7 +184,7 @@ def _filter_kv_none(kv):
 
 class SocialDataApp(Generic[K, V, R, A]):
 
-    def __init__(self, app_name: str, driver: ParsodaDriver, num_partitions=None, chunk_size=128):
+    def __init__(self, app_name: str):
         """
         Creates a new social data app
         :param app_name: application (or sub-application) name
@@ -192,9 +193,6 @@ class SocialDataApp(Generic[K, V, R, A]):
         :param chunk_size: the preferred size of the data chunks read from the input files
         """
         self.__app_name = app_name
-        self.__num_partitions = num_partitions
-        self.__chunk_size = chunk_size
-        self.__driver = driver
         
         self.__crawlers: List[Crawler] = []
         self.__filters: List[Filter] = []
@@ -204,20 +202,6 @@ class SocialDataApp(Generic[K, V, R, A]):
         self.__analyzer: Optional[Analyzer[K, R, A]] = None
         self.__visualizer: Optional[Visualizer[A]] = None
         self.__report_file: str = "parsoda_report.csv"
-        
-    def set_num_partitions(self, num_partitions: int):
-        """
-        Sets the number of partitions. This is overriden by the chunk size if it is set.
-        """
-        self.__num_partitions = num_partitions
-        return self
-
-    def set_chunk_size(self, chunk_size: int):
-        """
-        Sets the data chunk size in megabytes. This parameter overrides the number of partitions.
-        """
-        self.__chunk_size = chunk_size
-        return self
         
     def set_report_file(self, filename: str):
         self.__report_file = filename
@@ -268,7 +252,7 @@ class SocialDataApp(Generic[K, V, R, A]):
         self.__visualizer = visualizer
         return self
 
-    def execute(self) -> ParsodaReport:
+    def execute(self, driver: ParsodaDriver=ParsodaMultiCoreDriver(), num_partitions=-1, chunk_size=128) -> ParsodaReport:
         #locale.setlocale(locale.LC_ALL, "en_US.utf8")
 
         if self.__crawlers is None or len(self.__crawlers) == 0:
@@ -286,14 +270,12 @@ class SocialDataApp(Generic[K, V, R, A]):
 
         # VERY IMPORTANT: de-couples all objects from "self"
         # Avoids "self" to be serialized by some execution environment (e.g., PySpark)
-        driver = self.__driver
         reducer = self.__reducer
         secondary_key = self.__secondary_sort_key_function
 
-
-        print(f"[ParSoDA/{self.__app_name}] initializing driver: {type(self.__driver).__name__}")
-        driver.set_chunk_size(self.__chunk_size*1024*1024)
-        driver.set_num_partitions(self.__num_partitions)
+        print(f"[ParSoDA/{self.__app_name}] initializing driver: {type(driver).__name__}")
+        driver.set_chunk_size(chunk_size*1024*1024)
+        driver.set_num_partitions(num_partitions)
         driver.init_environment()
 
         crawling_time: int
@@ -376,9 +358,9 @@ class SocialDataApp(Generic[K, V, R, A]):
 
         report = ParsodaReport(
             self.__app_name,
-            self.__driver,
-            self.__num_partitions,
-            self.__chunk_size,
+            driver,
+            num_partitions,
+            chunk_size,
             crawling_time,
             filter_time,
             map_time,

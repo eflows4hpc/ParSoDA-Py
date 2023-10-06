@@ -15,20 +15,17 @@ def __secondary_key(x):
     return x[0]
 
 def parsoda_trajectory_mining(
-    driver: ParsodaDriver,
-    crawlers: List[Crawler],
     rois_file: str,
-    *, 
-    num_partitions=-1, 
-    chunk_size=64, 
+    *,
+    crawlers: List[Crawler] = [],
     min_trajectory_length=3,  
     min_support=1, 
     min_gap=0, 
     max_gap=10, 
     visualization_file="trajectory_mining.txt",
     visualization_min_length=3
-):  
-    app = SocialDataApp("Trajectory Mining", driver, num_partitions=num_partitions, chunk_size=chunk_size)
+) -> SocialDataApp:  
+    app = SocialDataApp("Trajectory Mining")
     app.set_crawlers(crawlers)
     app.set_filters([
         IsInRoI(rois_file)

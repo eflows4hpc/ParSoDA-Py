@@ -14,18 +14,15 @@ from parsoda.model.function.crawler import Crawler
 
 
 def parsoda_sentiment_analysis(
-    driver: ParsodaDriver,
-    crawlers: List[Crawler],
-    *, 
-    num_partitions=-1, 
-    chunk_size=64,
+    *,
+    crawlers=[],
     emoji_file="./resources/input/emoji.json", 
     visualization_file="./resources/output/emoji_polarization.txt",
     keywords: str = "",
     keywords_separator: str = " ",
     keywords_threshold: int = 1
-):  
-    app = SocialDataApp("Sentiment Analysis", driver, num_partitions=num_partitions, chunk_size=chunk_size)
+) -> SocialDataApp:  
+    app = SocialDataApp("Sentiment Analysis")
     app.set_crawlers(crawlers)
     app.set_filters([
         ContainsKeywords(

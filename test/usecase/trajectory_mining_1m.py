@@ -15,14 +15,11 @@ from test.usecase.parsoda_usecase_parameters import ParsodaUseCaseParameters
 if __name__ == '__main__':
     test = ParsodaUseCaseParameters()
     app = parsoda_trajectory_mining(
-        driver = test.driver,
         crawlers = [
             DistributedFileCrawler('resources/input/test.json', ParsodaParser())
         ],
         rois_file="./resources/input/RomeRoIs.kml",
-        num_partitions=test.partitions, 
-        chunk_size=test.chunk_size,
         visualization_file="./resources/output/trajectory_mining.txt"
     )
-    app.execute()
+    app.execute(driver = test.driver, num_partitions=test.partitions, chunk_size=test.chunk_size)
     
