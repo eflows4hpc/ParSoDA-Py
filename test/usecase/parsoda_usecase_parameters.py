@@ -13,6 +13,9 @@ class ParsodaUseCaseParameters:
                 from parsoda.model.driver.parsoda_pyspark_driver import ParsodaPySparkDriver
                 import pyspark
                 return ParsodaPySparkDriver(pyspark.SparkContext(conf=pyspark.SparkConf()))
+            elif arg == "multicore":
+                from parsoda.model.driver.parsoda_multicore_driver import ParsodaMultiCoreDriver
+                return ParsodaMultiCoreDriver()
             elif arg == "singlecore":
                 from parsoda.model.driver.parsoda_singlecore_driver import ParsodaSingleCoreDriver
                 return ParsodaSingleCoreDriver()
