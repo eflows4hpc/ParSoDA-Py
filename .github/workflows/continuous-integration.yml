@@ -2,7 +2,6 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ "main" ]
     paths:
       - 'parsoda/**'
       - 'test/**'
@@ -11,7 +10,6 @@ on:
       - 'requirements**'
       - '.github/workflows/continuous-integration.yml'
   pull_request:
-    branches: [ "main" ]
     paths:
       - 'parsoda/**'
       - 'test/**'
