@@ -32,14 +32,8 @@ and run
 # ParSoDA on top of PyCOMPSs
 For using the ParSoDA library on top of PyCOMPSs, it is required to import and instantiate the ParsodaPyCompssDriver class, as in the following Trajectory Mining example:
 
-    driver = ParsodaPyCompssDriver()
-    
-    app = SocialDataApp("Trajectory Mining", driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
-
-    app.set_crawlers([
-        LocalFileCrawler('/root/dataset/FlickrRome2017.json', FlickrParser())
-        LocalFileCrawler('/root/dataset/TwitterRome2017.json', TwitterParser())
-    ])
+    # statically define application algorithm
+    app = SocialDataApp("Trajectory Mining")
     app.set_filters([
         IsInRoI("./resources/input/RomeRoIs.kml")
     ])
@@ -56,7 +50,13 @@ For using the ParSoDA library on top of PyCOMPSs, it is required to import and i
         )
     )
 
-    app.execute()
+    # setup runtime environment and run the application
+    driver = ParsodaPyCompssDriver()
+    app.set_crawlers([
+        LocalFileCrawler('/root/dataset/FlickrRome2017.json', FlickrParser())
+        LocalFileCrawler('/root/dataset/TwitterRome2017.json', TwitterParser())
+    ])
+    app.execute(driver, num_partitions=args.partitions, chunk_size=args.chunk_size)
 
 # Running an application
 For running an application, it is recommended to see the instructions of the execution environment used.
