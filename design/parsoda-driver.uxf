@@ -1,0 +1,54 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>120</x><y>118</y><w>260</w><h>80</h></coordinates><panel_attributes>&lt;&lt;concrete&gt;&gt;
+SocialDataApp
+-
++constructor(self, driver: ParsodaDriver)
+-
++execute(): void
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>460</x><y>38</y><w>480</w><h>230</h></coordinates><panel_attributes>&lt;&lt;interface&gt;&gt;
+&lt;&lt;implementor&gt;&gt;
+ParsodaDriver
+-
++init_environment()
++dispose_environment()
+-
++set_num_partitions(partitions: int): void
++crawl(crawlers: Iterable[Crawler]): void
++filter(filter: Callable[[Any],Iterable]): void
++map(mapper: Callable[[Any],Any]): void
++flatmap(mapper: Callable[[Any],Iterable[Any]]): void
++reduce_by_key(reducer: Callable[[Any, Any], Any]): void
++sort_by_key(): void
++get_result(): Iterable</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>390</x><y>328</y><w>190</w><h>80</h></coordinates><panel_attributes>&lt;&lt;concrete&gt;&gt;
+&lt;&lt;adapter&gt;&gt;
+ParsodaMultiCoreDriver
+-
++constructor(parallelism: int)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>400</x><y>458</y><w>170</w><h>60</h></coordinates><panel_attributes>symbol=component
+Python
+Multiprocessing</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>490</x><y>258</y><w>110</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;.
+&lt;&lt;implements&gt;&gt;</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element><element><id>Relation</id><coordinates><x>470</x><y>398</y><w>70</w><h>80</h></coordinates><panel_attributes>lt=&lt;..
+&lt;&lt;uses&gt;&gt;</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>610</x><y>328</y><w>170</w><h>80</h></coordinates><panel_attributes>&lt;&lt;concrete&gt;&gt;
+&lt;&lt;adapter&gt;&gt;
+ParsodaPyCompssDriver
+-
++constructor()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>610</x><y>458</y><w>170</w><h>60</h></coordinates><panel_attributes>symbol=component
+PyCOMPSs</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>680</x><y>398</y><w>70</w><h>80</h></coordinates><panel_attributes>lt=&lt;..
+&lt;&lt;uses&gt;&gt;</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>800</x><y>328</y><w>250</w><h>80</h></coordinates><panel_attributes>&lt;&lt;concrete&gt;&gt;
+&lt;&lt;adapter&gt;&gt;
+ParsodaPySparkDriver
+-
++constructor(spark_conf: SparkConf)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>830</x><y>458</y><w>170</w><h>60</h></coordinates><panel_attributes>symbol=component
+PySpark</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>910</x><y>398</y><w>70</w><h>80</h></coordinates><panel_attributes>lt=&lt;..
+&lt;&lt;uses&gt;&gt;</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>880</x><y>258</y><w>110</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;.
+&lt;&lt;implements&gt;&gt;</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element><element><id>Relation</id><coordinates><x>690</x><y>258</y><w>110</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;.
+&lt;&lt;implements&gt;&gt;</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element><element><id>UMLNote</id><coordinates><x>120</x><y>258</y><w>230</w><h>180</h></coordinates><panel_attributes>bg=#dddddd
+# Example of internal code
+
+...
+driver.crawl(self.crawlers)
+
+for filter_func in self.filters:
+  driver.filter(filter_func.test)
+
+driver.flatmap(self.mapper.map)
+...</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>160</x><y>188</y><w>60</w><h>90</h></coordinates><panel_attributes>lt=..</panel_attributes><additional_attributes>10;10;40;70</additional_attributes></element><element><id>Relation</id><coordinates><x>250</x><y>38</y><w>230</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
+-driver</panel_attributes><additional_attributes>10;80;10;20;210;20</additional_attributes></element></diagram>

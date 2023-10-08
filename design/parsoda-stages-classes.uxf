@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>290</x>
+      <y>70</y>
+      <w>270</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Crawler
+-
++open(partition_index:int):CrawlerIterator</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>330</x>
+      <y>210</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+CrawlerIterator (Iterator)
+-
++next():SocialDataItem</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>130</y>
+      <w>90</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;creates&gt;&gt;
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>640</x>
+      <y>210</y>
+      <w>260</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Parser
+-
++parse(text_item:String):SocialDataItem</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>250</y>
+      <w>180</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>provides 
+text items
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;20.0;160.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>640</x>
+      <y>40</y>
+      <w>260</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;concrete&gt;&gt;
+SocialDataItem
+-
+-id: long
+-text: String
+-tags: String[]
+-location: Pair&lt;double,double&gt;
+-extras: Map&lt;String,String&gt;
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>750</x>
+      <y>160</y>
+      <w>90</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;creates&gt;&gt;
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>290</x>
+      <y>350</y>
+      <w>240</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Filter
+-
++test(item: SocialDataItem): boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>630</x>
+      <y>340</y>
+      <w>290</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>template=K,V
+&lt;&lt;interface&gt;&gt;
+Mapper
+-
++map(item: SocialDataItem): Pair&lt;K,V&gt;[]</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>630</x>
+      <y>470</y>
+      <w>300</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>template=K,V,R
+&lt;&lt;interface&gt;&gt;
+Reducer
+--
++reduce(value1: V; value2: V): R</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>510</x>
+      <y>590</y>
+      <w>200</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>template=A
+&lt;&lt;interface&gt;&gt;
+Visualizer
+--
++visualize(result: A): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>290</x>
+      <y>470</y>
+      <w>240</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>template=K,R,A
+&lt;&lt;interface&gt;&gt;
+Analysis
+--
++analyze(results: Map&lt;K,R&gt;): A</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>270</y>
+      <w>130</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>provides
+social data items
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>520</x>
+      <y>350</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>provides 
+social data 
+items
+lt=&lt;-</panel_attributes>
+    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>760</x>
+      <y>420</y>
+      <w>120</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>provides 
+key-value pairs
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>490</x>
+      <y>490</y>
+      <w>160</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>provides 
+key-grouped
+values
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;20.0;140.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>390</x>
+      <y>550</y>
+      <w>140</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>provides 
+analysis
+result
+lt=&lt;-</panel_attributes>
+    <additional_attributes>120.0;70.0;10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>210</y>
+      <w>180</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>uses
+lt=&lt;-</panel_attributes>
+    <additional_attributes>160.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+</diagram>
