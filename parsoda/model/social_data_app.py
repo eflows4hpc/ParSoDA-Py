@@ -271,6 +271,7 @@ class SocialDataApp(Generic[K, V, R, A]):
     def execute(self) -> ParsodaReport:
         #locale.setlocale(locale.LC_ALL, "en_US.utf8")
 
+        # Check application components
         if self.__crawlers is None or len(self.__crawlers) == 0:
             raise Exception("No crawler is set")
         if self.__filters is None:
@@ -279,10 +280,15 @@ class SocialDataApp(Generic[K, V, R, A]):
             raise Exception("No mapper is set")
         if self.__reducer is None:
             raise Exception("No reducer is set")
-        if self.__analyzer is None:
-            raise Exception("No analyzer is set")
-        if self.__visualizer is None:
-            raise Exception("No visualizer is set")
+        
+        # Optional analyzer and visualizer warnings
+        if self.__analyzer is None and self.__visualizer is not None:
+            print("WARNING: the visualizer is set, but analyzer is not. Visualization will not be executed in this condition!")
+        else:
+            if self.__analyzer is None:
+                print("WARNING: No analyzer is set")
+            if self.__visualizer is None:
+                print("WARNING: No visualizer is set")
 
         # VERY IMPORTANT: de-couples all objects from "self"
         # Avoids "self" to be serialized by some execution environment (e.g., PySpark)
@@ -290,12 +296,13 @@ class SocialDataApp(Generic[K, V, R, A]):
         reducer = self.__reducer
         secondary_key = self.__secondary_sort_key_function
 
-
+        # Staart ParSoDA workflow, initialize driver
         print(f"[ParSoDA/{self.__app_name}] initializing driver: {type(self.__driver).__name__}")
         driver.set_chunk_size(self.__chunk_size*1024*1024)
         driver.set_num_partitions(self.__num_partitions)
         driver.init_environment()
 
+        # defines performance times variables
         crawling_time: int
         filter_time: int
         map_time: int
@@ -304,54 +311,54 @@ class SocialDataApp(Generic[K, V, R, A]):
         analysis_time: int
         visualization_time: int
 
+        # create a stopwatch for collecting execution times of ParSoDA phases
         stopwatch = StopWatch()
 
-        print(f"[ParSoDA/{self.__app_name}] crawling...")
+        print(f"[ParSoDA/{self.__app_name}] crawling")
         driver.crawl(self.__crawlers)
         crawling_time = stopwatch.get_and_reset()
         
-        print(f"[ParSoDA/{self.__app_name}] filtering \"None\" values...")
+        print(f"[ParSoDA/{self.__app_name}] filtering \"None\" values")
         driver.filter(_filter_none)
 
         # item1, item2, item3, item4, ...
 
-        print(f"[ParSoDA/{self.__app_name}] filtering...")
+        print(f"[ParSoDA/{self.__app_name}] filtering")
         for filter_func in self.__filters:
             driver.filter(filter_func.test)
         filter_time = stopwatch.get_and_reset()
 
         # item1, item3, item4, item7, ...
 
-        print(f"[ParSoDA/{self.__app_name}] mapping...")
+        print(f"[ParSoDA/{self.__app_name}] mapping")
         driver.flatmap(self.__mapper.map)
         map_time = stopwatch.get_and_reset()
 
         # (k1, v1) (k1, v2), (k2, v3) ...
 
-        print(f"[ParSoDA/{self.__app_name}] splitting...")
+        print(f"[ParSoDA/{self.__app_name}] splitting")
         driver.group_by_key()
 
         # k1 -> [v2, v1, v6, v5 ...], k2 -> [v8, v5, v3 ...], ... (unsorted values)
 
         # sort values (optional)
         if secondary_key is not None:
-            print(f"[ParSoDA/{self.__app_name}] secondary sorting...")
+            print(f"[ParSoDA/{self.__app_name}] secondary sorting")
             driver.map(_sort_kvs(secondary_key))
         
-            
         split_time = stopwatch.get_and_reset()
 
-        print(f"[ParSoDA/{self.__app_name}] reducing...")
+        print(f"[ParSoDA/{self.__app_name}] reducing")
         driver.map(_reduce(reducer))
 
         # k1 -> r1, k2 -> r2, k3 -> r3, ...
 
-        print(f"[ParSoDA/{self.__app_name}] filtering \"None\" values...")
+        print(f"[ParSoDA/{self.__app_name}] filtering \"None\" values")
         driver.filter(_filter_kv_none)
         
         # k1 -> r1, k3 -> r3, k6 -> r6, ...
 
-        print(f"[ParSoDA/{self.__app_name}] collecting reduction results...")
+        print(f"[ParSoDA/{self.__app_name}] collecting reduction results")
         reduction_result = dict(driver.get_result())
         reduce_time = stopwatch.get_and_reset()
 
@@ -361,18 +368,24 @@ class SocialDataApp(Generic[K, V, R, A]):
         print(f"[ParSoDA/{self.__app_name}] len(reduction_result)={reduction_result_length}")
         stopwatch.reset()
 
-        print(f"[ParSoDA/{self.__app_name}] disposing driver...")
+        print(f"[ParSoDA/{self.__app_name}] disposing driver")
         driver.dispose_environment()
 
-        print(f"[ParSoDA/{self.__app_name}] analyzing...")
-        analysis_result = self.__analyzer.analyze(driver, reduction_result)
-        analysis_time = stopwatch.get_and_reset()
+        if(self.__analyzer is not None):
+            print(f"[ParSoDA/{self.__app_name}] analyzing")
+            analysis_result = self.__analyzer.analyze(driver, reduction_result)
+            analysis_time = stopwatch.get_and_reset()
+            
+            if(self.__visualizer is not None):
+                print(f"[ParSoDA/{self.__app_name}] visualizing")
+                self.__visualizer.visualize(analysis_result)
+                visualization_time = stopwatch.get_and_reset()
+            else:
+                print(f"[ParSoDA/{self.__app_name}] skipping visualization, as the visualizer is not set")
+        else:
+            print(f"[ParSoDA/{self.__app_name}] skipping analysis and visualization, as the analyzer is not set")
 
-        print(f"[ParSoDA/{self.__app_name}] visualizing...")
-        self.__visualizer.visualize(analysis_result)
-        visualization_time = stopwatch.get_and_reset()
-
-        print(f"[ParSoDA/{self.__app_name}] building report...")
+        print(f"[ParSoDA/{self.__app_name}] building report")
 
         report = ParsodaReport(
             self.__app_name,
