@@ -11,7 +11,7 @@ on:
             - VERSION
 
 permissions:
-  contents: read
+    contents: write
 
 jobs:
     build:
