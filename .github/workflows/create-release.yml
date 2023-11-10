@@ -1,0 +1,48 @@
+name: Create Stable Release
+
+on:
+    push:
+        branches: ["main"]
+        paths:
+            - VERSION
+    pull_request:
+        branches: ["main"]
+        paths:
+            - VERSION
+
+permissions:
+  contents: read
+
+jobs:
+    build:
+        name: Build Release
+        runs-on: ubuntu-latest
+        steps:
+        - 
+            name: Checkout code
+            uses: actions/checkout@v2
+        -
+            uses: actions/setup-python@v4
+            with:
+                python-version: '3.10' 
+        -
+            name: Test package build
+            run: python3 -m pip install .
+        - 
+            name: Read VERSION file
+            id: versioning
+            run: |
+                echo "::set-output name=version::$(cat VERSION)"
+        - 
+            name: Create Stable Release
+            id: create_release
+            uses: actions/create-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+            with:
+              tag_name: v${{steps.versioning.outputs.version}}
+              release_name: v${{steps.versioning.outputs.version}}
+              body: |
+              draft: false
+              prerelease: false
+                

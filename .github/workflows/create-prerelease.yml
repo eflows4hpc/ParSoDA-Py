@@ -1,0 +1,44 @@
+name: Create Pre-Release
+
+on:
+    push:
+        branches: ["release"]
+    pull_request:
+        branches: ["release"]
+
+permissions:
+  contents: read
+
+jobs:
+    build:
+        name: Build Pre-Release
+        runs-on: ubuntu-latest
+        steps:
+        - 
+            name: Checkout code
+            uses: actions/checkout@v2
+        -
+            uses: actions/setup-python@v4
+            with:
+                python-version: '3.10' 
+        -
+            name: Build Release
+            run: python3 -m pip install .
+        - 
+            name: Create current version based on time
+            id: versioning
+            run: |
+                echo "::set-output name=version::$(date +'%Y-%m-%d' --utc)"
+        - 
+            name: Create Stable Release
+            id: create_release
+            uses: actions/create-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+            with:
+              tag_name: unstable-${{steps.versioning.outputs.version}}
+              release_name: Unstable-${{steps.versioning.outputs.version}}
+              body: |
+              draft: false
+              prerelease: true
+                
