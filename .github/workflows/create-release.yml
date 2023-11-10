@@ -42,7 +42,6 @@ jobs:
             with:
               tag_name: v${{steps.versioning.outputs.version}}
               release_name: v${{steps.versioning.outputs.version}}
-              body: |
               draft: false
               prerelease: false
                 

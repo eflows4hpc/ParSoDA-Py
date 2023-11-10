@@ -38,7 +38,6 @@ jobs:
             with:
               tag_name: unstable-${{steps.versioning.outputs.version}}
               release_name: Unstable-${{steps.versioning.outputs.version}}
-              body: |
               draft: false
               prerelease: true
                 
