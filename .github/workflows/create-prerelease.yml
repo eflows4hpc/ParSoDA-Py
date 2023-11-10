@@ -1,6 +1,7 @@
 name: Create Pre-Release
 
 on:
+    workflow_dispatch:
     push:
         branches: ["release"]
     pull_request:
