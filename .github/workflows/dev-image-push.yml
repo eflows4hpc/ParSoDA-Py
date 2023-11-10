@@ -2,23 +2,9 @@ name: Continuous Delivery
 
 on:
     push:
-        branches: [ "main" ]
-        paths:
-          - 'parsoda/**'
-          - 'test/**'
-          - 'resources/input/**'
-          - 'Dockerfile'
-          - 'requirements**'
-          - '.github/workflows/continuous-delivery.yml'
+        branches: ["development"]
     pull_request:
-        branches: [ "main" ]
-        paths:
-          - 'parsoda/**'
-          - 'test/**'
-          - 'resources/input/**'
-          - 'Dockerfile'
-          - 'requirements**'
-          - '.github/workflows/continuous-delivery.yml'
+        branches: ["development"]
 
 permissions:
   contents: read
