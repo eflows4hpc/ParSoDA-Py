@@ -2,21 +2,9 @@ name: Continuous Integration
 
 on:
   push:
-    paths:
-      - 'parsoda/**'
-      - 'test/**'
-      - 'resources/input/**'
-      - 'Dockerfile'
-      - 'requirements**'
-      - '.github/workflows/continuous-integration.yml'
+    branches-ignore: ["main", "release"]
   pull_request:
-    paths:
-      - 'parsoda/**'
-      - 'test/**'
-      - 'resources/input/**'
-      - 'Dockerfile'
-      - 'requirements**'
-      - '.github/workflows/continuous-integration.yml'
+    branches-ignore: ["main", "release"]
 
 permissions:
   contents: read
