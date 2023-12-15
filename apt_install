@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# script used for installing software through apt in Dockerfiles, avoiding layer cache and size problems 
+
+# update packages lists
+DEBIAN_FRONTEND=noninteractive apt update -y
+
+# install required software
+DEBIAN_FRONTEND=noninteractive apt install -y $@
+
+# clean apt cache and lists
+DEBIAN_FRONTEND=noninteractive apt clean
+rm -rf /var/cache/apt/archives /var/lib/apt/lists/*

@@ -208,6 +208,12 @@ class SocialDataApp(Generic[K, V, R, A]):
     def set_num_partitions(self, num_partitions: int):
         """
         Sets the number of partitions. This is overriden by the chunk size if it is set.
+
+        Args:
+            num_partitions (int): The wanted partitions number per crawler
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
         """
         self.__num_partitions = num_partitions
         return self
@@ -215,14 +221,41 @@ class SocialDataApp(Generic[K, V, R, A]):
     def set_chunk_size(self, chunk_size: int):
         """
         Sets the data chunk size in megabytes. This parameter overrides the number of partitions.
+
+        Args:
+            chunk_size (int): The wanted partition size
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
         """
         self.__chunk_size = chunk_size
         return self
         
     def set_report_file(self, filename: str):
+        """
+        Sets the file name of the ParSoDA report
+
+        Args:
+            filename (str): The file name where the report will be saved
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         self.__report_file = filename
+        return self
 
     def set_crawlers(self, crawlers: List[Crawler]):
+        """Sets the list of crawlers to be used for loading data
+
+        Args:
+            crawlers (List[Crawler]): A list of Crawler objects
+
+        Raises:
+            Exception: if no crawler is given
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         if crawlers is None or len(crawlers) == 0:
             raise Exception("No crawler given")
         self.__crawlers = []
@@ -231,6 +264,17 @@ class SocialDataApp(Generic[K, V, R, A]):
         return self
 
     def set_filters(self, filters: List[Filter]):
+        """Sets the filters to be applied to data
+
+        Args:
+            filters (List[Filter]): the list of filters
+
+        Raises:
+            Exception: if no filter is given
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         if filters is None or len(filters) == 0:
             raise Exception("No filter given")
         self.__filters = []
@@ -239,38 +283,101 @@ class SocialDataApp(Generic[K, V, R, A]):
         return self
 
     def set_mapper(self, mapper: Mapper[K, V]):
+        """Sets the mapper to be used in Map-Reduce step
+
+        Args:
+            mapper (Mapper[K, V]): the mapper
+
+        Raises:
+            Exception: if no mapper is given
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         if mapper is None:
             raise Exception("No mapper given")
         self.__mapper = mapper
         return self
 
     def set_secondary_sort_key(self, key_function: Callable[[V], SORTABLE_KEY]):
+        """Sets a key-function to be used for secondary sort step. If no key-function is set, the secondary sort will not be executed. 
+        A key object returned by the specified key-function must be a sortable object, i.e. an object that can be compared to other objects of the same type.
+
+        Args:
+            key_function (Callable[[V], SORTABLE_KEY]): a callable object which maps an item to a key.
+
+        Raises:
+            Exception: if no key-function is given
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         if key_function is None:
             raise Exception("No key function given")
         self.__secondary_sort_key_function = key_function
         return self
 
     def set_reducer(self, reducer: Reducer[K, V, R]):
+        """Sets the reducer to be used in Map-Reduce step.
+
+        Args:
+            reducer (Reducer[K, V, R]): the reducer
+
+        Raises:
+            Exception: if no reducer is given
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         if reducer is None:
             raise Exception("No reducer given")
         self.__reducer = reducer
         return self
 
     def set_analyzer(self, analyzer: Analyzer[K, R, A]):
+        """Sets an optional analysis function.
+        This could be a function that creates a new SocialDataApp instance and could use the same driver given in the current one.
+
+        Args:
+            analyzer (Analyzer[K, R, A]): the analyzer
+
+        Raises:
+            Exception: if no analyzer is given
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         if analyzer is None:
             raise Exception("No analyzer given")
         self.__analyzer = analyzer
         return self
 
     def set_visualizer(self, visualizer: Visualizer[A]):
+        """Set an optional function for the visualization step (e.g., a function that writes results to a file)
+
+        Args:
+            visualizer (Visualizer[A]): the visualizer
+
+        Raises:
+            Exception: if no analyzer is given
+
+        Returns:
+            SocialDataApp: this SocialDataApp instance
+        """
         if visualizer is None:
             raise Exception("No visualizer given")
         self.__visualizer = visualizer
         return self
 
     def execute(self) -> ParsodaReport:
-        #locale.setlocale(locale.LC_ALL, "en_US.utf8")
+        """Runs the application and returns a report about its execution.
 
+        Raises:
+            Exception: if some preliminary check fails (e.g. no crawlers are set) or some ParSoDA step fails during the execution.
+
+        Returns:
+            ParsodaReport: the execution report
+        """
         # Check application components
         if self.__crawlers is None or len(self.__crawlers) == 0:
             raise Exception("No crawler is set")
@@ -296,7 +403,7 @@ class SocialDataApp(Generic[K, V, R, A]):
         reducer = self.__reducer
         secondary_key = self.__secondary_sort_key_function
 
-        # Staart ParSoDA workflow, initialize driver
+        # Start ParSoDA workflow, initialize driver
         print(f"[ParSoDA/{self.__app_name}] initializing driver: {type(self.__driver).__name__}")
         driver.set_chunk_size(self.__chunk_size*1024*1024)
         driver.set_num_partitions(self.__num_partitions)
