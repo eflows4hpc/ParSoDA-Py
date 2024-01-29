@@ -64,6 +64,11 @@ class Crawler(ABC):
 
     @abstractmethod
     def supports_remote_partitioning(self) -> bool:
+        """Checks if the crawler supports remote partitioning, i.e. the ability to read data directly from the worker nodes
+
+        Returns:
+            bool: true if the crawler supports remote partitionig of data source.
+        """
         pass
 
 

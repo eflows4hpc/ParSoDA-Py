@@ -10,9 +10,12 @@ class Filter(ABC):
 
     @abstractmethod
     def test(self, item: SocialDataItem) -> bool:
-        """
-        Test if the item satisfies the predicate of the filter
-        :param item: the item to test
-        :return: True if the item satisfies the predicate, False otherwise
-        """
+        """Test if the item satisfies the predicate of the filter
+
+        Args:
+            item (SocialDataItem): the item to test
+
+        Returns:
+            bool: True if the item satisfies the predicate, False otherwise
+        """        
         pass

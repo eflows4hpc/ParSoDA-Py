@@ -3,17 +3,22 @@ FROM ubuntu:20.04
 USER root
 WORKDIR /root
 
+# RUN alias apt_install="DEBIAN_FRONTEND=noninteractive apt update -y && DEBIAN_FRONTEND=noninteractive apt install -y"
+# RUN alias apt_clean="apt clean && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*"
+
+COPY --chmod=777 apt_install /apt_install
+
 # install utility software packages
-RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt install -y software-properties-common&& rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
-RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt install -y inetutils-ping net-tools wget && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
-RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt install -y htop screen zip nano && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+RUN /apt_install software-properties-common
+RUN /apt_install inetutils-ping net-tools wget
+RUN /apt_install htop screen zip nano
 	
 # install and configure git
-RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt install -y git && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+RUN /apt_install git
 RUN DEBIAN_FRONTEND=noninteractive git config --global commit.gpgsign false
 
 # configure ssh daemon
-RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt install -y openssh-server && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+RUN /apt_install openssh-server
 RUN if ! [ -d /var/run/sshd ]; then mkdir /var/run/sshd; fi
 RUN echo 'root:password!!' | chpasswd
 RUN sed -i 's/^[# ]*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
@@ -41,9 +46,9 @@ RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/' >> ~/.bashrc
 RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt install -y python3 python3-pip python3-dev && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # install PyCOMPSs
-RUN DEBIAN_FRONTEND=noninteractive apt update -y && apt install -y graphviz xdg-utils libtool automake build-essential \
+RUN /apt_install graphviz xdg-utils libtool automake build-essential \
 	python python-dev libpython2.7 libboost-serialization-dev libboost-iostreams-dev libxml2 libxml2-dev csh gfortran \
-	libgmp3-dev flex bison texinfo libpapi-dev && rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
+	libgmp3-dev flex bison texinfo libpapi-dev
 RUN python3 -m pip install --upgrade pip setuptools
 RUN python3 -m pip install dill guppy3
 RUN python3 -m pip install "pycompss==3.1" -v

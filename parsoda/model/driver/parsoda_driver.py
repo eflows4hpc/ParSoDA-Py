@@ -30,7 +30,6 @@ class ParsodaDriver(ABC):
     def set_num_partitions(self, num_partitions: int) -> None:
         """
         Sets the number of data partitions
-        :return: None
         """
         pass
 
@@ -38,7 +37,6 @@ class ParsodaDriver(ABC):
     def set_chunk_size(self, chunk_size: int) -> None:
         """
         Sets the size of data partitions in bytes
-        :return: None
         """
         pass
 
@@ -55,7 +53,6 @@ class ParsodaDriver(ABC):
 
         After invoking this function the implementor should hold a representation of an initial dataset
         (e.g., on Spark a new RDD is populated with the SocialDataItem objects provided by crawlers)
-        :return: None
         """
         pass
 
@@ -63,8 +60,9 @@ class ParsodaDriver(ABC):
     def filter(self, filter_func: Callable[[Any], bool]) -> None:
         """
         Applies the given filter to the current dataset, dropping all items that does not satisfy the filter
-        :param filter_func: the filter to apply
-        :return: None
+        
+        Args:
+            filter_func: the filter to apply
         """
         pass
 
@@ -72,36 +70,43 @@ class ParsodaDriver(ABC):
     def flatmap(self, mapper: Callable[[Any], Iterable[Any]]) -> None:
         """
         Executes a mapping of each item to a list of custom key-value pairs, represented as tuples of two elements each
-        :param mapper: the (object -> list[(K,V)]) mapping function to apply
-        :return: None
+        
+        Args:
+            mapper: the (object -> list[(K,V)]) mapping function to apply
         """
         pass
 
     def map(self, mapper: Callable[[Any], Any]) -> None:
         """
-        Executes a mapping of each item in the current dataset to a new object
-        :param mapper: the (object -> list[(K,V)]) mapping function to apply
-        :return: None
+        Executes a mapping of each item in the current dataset to a new object.
+        
+        Args:
+            mapper: the (object -> list[(K,V)]) mapping function to apply
         """
         self.flatmap(_flatmapper(mapper))
 
     #TODO: documentation
     def group_by_key(self) -> None:
-        """Assumes that the current dataset is a bulk of key-value pairs and creates a new dataset which groups all the items with the same key. The new dataset will be a bulk of (key)-(list-of-values) pairs.
+        """Assumes that the current dataset is a bulk of key-value pairs
+        and creates a new dataset which groups all the items with the same key. 
+        The new dataset will be a bulk of (key)-(list-of-values) pairs.
         """
         pass
 
     def get_result(self) -> Any:
         """
         Gets the current dataset
-        :return: the current dataset
+        
+        Returns:
+            Any: the current dataset
         """
         pass
 
     @abstractmethod
     def dispose_environment(self) -> None:
         """
-        Disposes instantiated resources of the underlying environment, after executing the ParSoDA application, in order to reuse this driver as a new fresh driver that should be re-initialized
-        :return: None
+        Disposes instantiated resources of the underlying environment,
+        after executing the ParSoDA application, in order to reuse
+        this driver as a new fresh driver that should be re-initialized
         """
         pass

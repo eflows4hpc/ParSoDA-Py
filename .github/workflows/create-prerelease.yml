@@ -31,7 +31,7 @@ jobs:
             run: |
                 echo "::set-output name=version::$(date +'%Y-%m-%d' --utc)"
         - 
-            name: Create Stable Release
+            name: Create Pre-Release
             id: create_release
             uses: actions/create-release@v1
             env:
