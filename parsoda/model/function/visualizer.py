@@ -11,4 +11,9 @@ class Visualizer(ABC, Generic[A]):
 
     @abstractmethod
     def visualize(self, result: A) -> None:
+        """Transforms data from the analysis step in some output format, then write them to some output device or system.
+
+        Args:
+            result (A): the data resulting from the analysis step
+        """
         pass

@@ -14,10 +14,13 @@ class Mapper(ABC, Generic[K, V]):
 
     @abstractmethod
     def map(self, item: SocialDataItem) -> Iterable[Tuple[K, V]]:
-        """
-        Returns a list of key-value pairs computed from the given item.
+        """Returns a list of key-value pairs computed from the given item.
         Example result: [ (item.user_id, item.tags[0]), (item.user_id, item.tags[1]), ... ]
-        :param item: the item to map
-        :return: a list of key-value pairs
+
+        Args:
+            item (SocialDataItem): the item to map
+
+        Returns:
+            Iterable[Tuple[K, V]]: an iterable of key-value pairs
         """
         pass

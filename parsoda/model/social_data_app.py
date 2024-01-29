@@ -44,49 +44,124 @@ class ParsodaReport:
         
         self.__reduce_result_length = reduce_result_length
                      
-    def get_app_name(self):
+    def get_app_name(self)->str:
+        """Gets the referred application name
+
+        Returns:
+            str: the app name
+        """
         return self.__app_name
         
-    def get_driver(self):
+    def get_driver(self)->ParsodaDriver:
+        """Gets the driver used by the application
+
+        Returns:
+            ParsodaDriver: the driver object
+        """
         return self.__driver
         
-    def get_partitions(self):
+    def get_partitions(self)->int:
+        """Gets the number of partitions used during execution
+
+        Returns:
+            int: number of partitions
+        """
         return self.__partitions
     
-    def get_chunk_size(self):
+    def get_chunk_size(self)->int:
+        """Gets the data chunk size, i.e. the partitoin size, used during execution
+
+        Returns:
+            int: data chunck size
+        """
         return self.__chunk_size
         
-    def get_crawling_time(self):
+    def get_crawling_time(self)->float:
+        """Gets the time spent on crawling
+
+        Returns:
+            float: the crawling time in seconds
+        """
         return self.__crawling_time
         
-    def get_filter_time(self):
+    def get_filter_time(self)->float:
+        """Gets the time spent on filtering
+
+        Returns:
+            float: the filter time in seconds
+        """
         return self.__filter_time
         
-    def get_map_time(self):
+    def get_map_time(self)->float:
+        """Gets the time spent on mapping
+
+        Returns:
+            float: the map time in seconds
+        """
         return self.__map_time
         
-    def get_split_time(self):
+    def get_split_time(self)->float:
+        """Gets the time spent on splitting
+
+        Returns:
+            float: the split time in seconds
+        """
         return self.__split_time
         
-    def get_reduce_time(self):
+    def get_reduce_time(self)->float:
+        """Gets the time spent on reduction
+
+        Returns:
+            float: the reduce time in seconds
+        """
         return self.__reduce_time
         
-    def get_analysis_time(self):
+    def get_analysis_time(self)->float:
+        """Gets the time spent on analysis
+
+        Returns:
+            float: the analysis time in seconds
+        """
         return self.__analysis_time
         
-    def get_visualization_time(self):
+    def get_visualization_time(self)->float:
+        """Gets the time spent on visualization
+
+        Returns:
+            float: the visualization time in seconds
+        """
         return self.__visualization_time
 
-    def get_total_execution_time(self):
+    def get_parallel_execution_time(self)->float:
+        """Gets the time spent on parallel execution, i.e. the time spent from filtering to reduction.
+
+        Returns:
+            float: the parallel execution time
+        """
         return self.__filter_to_reduce_time
 
-    def get_total_execution_time(self):
+    def get_total_execution_time(self)->float:
+        """Gets the time spent on execution, from filtering to visualization, excluding the crawling step
+
+        Returns:
+            float: the total execution time in seconds
+        """
         return self.__total_execution_time
         
     def get_total_time(self):
+        """Gets the total time spent for completing the application, from crawling to visualization, i.e. the response time
+
+        Returns:
+            float: the total response time
+        """
         return self.__total_time
         
     def get_reduce_result_length(self):
+        """Gets the number of items obtained by executing the reduction. This value can be used for debbugging purposes and for testing the correctness of the parallel execution.
+
+        Returns:
+            float: the length of the reduction result
+        """
         return self.__reduce_result_length
 
     def __repr__(self):
@@ -117,6 +192,14 @@ class ParsodaReport:
         "| Reduce result length: " + str(self.__reduce_result_length) + "\n"
     
     def to_csv_line(self, separator: str = ";") -> str:
+        """Creates a CSV (Comma Separated Value) line for this report, by using the specified separator
+
+        Args:
+            separator (str, optional): The values separator. Defaults to ";".
+
+        Returns:
+            str: the CSV line
+        """
         return \
             str(self.__app_name)+separator+\
             str(self.__partitions)+separator+\
@@ -134,6 +217,16 @@ class ParsodaReport:
             str(self.__reduce_result_length)
     
     def to_csv_titles(self, separator: str = ";") -> str:
+        """Creates a CSV (Comma Separated Value) header line, by using the specified separator. 
+        The returned line contains just the standard titles of report columns.
+        It can be used for writing the first header line of a CSV file that would store more than one execution report.
+
+        Args:
+            separator (str, optional): The values separator. Defaults to ";".
+
+        Returns:
+            str: the columns titles in a CSV line
+        """
         return \
             "App Name"+separator+\
             "Partitions"+separator+\

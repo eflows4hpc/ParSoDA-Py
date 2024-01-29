@@ -12,10 +12,13 @@ class Reducer(ABC, Generic[K, V, R]):
     """
 
     def reduce(self, key: K, values: List[V]) -> R:
-        """
-        Applies the reduction algorithm to values
-        :param key: the key all values are associated to
-        :param values: all the values associated to the key
-        :return: the reduced value
+        """Applies the reduction algorithm to values
+
+        Args:
+            key (K): the key all values are associated to
+            values (List[V]): all the values associated to the key
+
+        Returns:
+            R: the reduced value
         """
         pass
